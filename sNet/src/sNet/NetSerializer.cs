@@ -24,6 +24,24 @@ public sealed class NetSerializer : IDisposable
 		_stream.WriteByte(value);
 		WrittenBytes += sizeof(byte);
 	}
+	
+	public void WriteInt16(short value)
+	{
+		_stream.WriteNetInt16(value);
+		WrittenBytes += sizeof(short);
+	}
+	
+	public void WriteUInt16(ushort value)
+	{
+		_stream.WriteNetUInt16(value);
+		WrittenBytes += sizeof(ushort);
+	}
+	
+	public void WriteChar(char value)
+	{
+		_stream.WriteNetChar(value);
+		WrittenBytes += sizeof(char);
+	}
 
 	public void WriteInt32(int value)
 	{
@@ -37,9 +55,26 @@ public sealed class NetSerializer : IDisposable
 		WrittenBytes += sizeof(uint);
 	}
 
+	public void WriteInt64(long value)
+	{
+		_stream.WriteNetInt64(value);
+		WrittenBytes += sizeof(long);
+	}
+
+	public void WriteUInt64(ulong value)
+	{
+		_stream.WriteNetUInt64(value);
+		WrittenBytes += sizeof(ulong);
+	}
+
 	public void WriteUtf8(string value)
 	{
 		WrittenBytes += _stream.WriteNetUtf8(value);
+	}
+	
+	public void WriteUtf16(string value)
+	{
+		WrittenBytes += _stream.WriteNetUtf16(value);
 	}
 
 	/// <summary>
