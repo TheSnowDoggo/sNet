@@ -1,8 +1,8 @@
 ﻿namespace sNet.Server;
 
-public abstract class IServerService
+public abstract class ServerService
 {
-	public IServerService(ServiceId serviceId)
+	public ServerService(ServiceId serviceId)
 	{
 		ServiceId = serviceId;
 	}
@@ -11,7 +11,19 @@ public abstract class IServerService
 	
 	public ServiceId ServiceId { get; }
 
+	public virtual void Initialize()
+	{
+	}
+
 	public virtual void Receive(ServerNetCall call)
+	{
+	}
+
+	public virtual void ClientJoined(RemoteClient client)
+	{
+	}
+
+	public virtual void ClientLeft(RemoteClient client)
 	{
 	}
 }

@@ -30,12 +30,13 @@ public sealed class ClientServiceStore : IReadOnlyCollection<ClientService>
 	
 	public void Add(ClientService service)
 	{
-		if (_services.TryAdd(service.ServiceId, service))
+		if (!_services.TryAdd(service.ServiceId, service))
 		{
 			throw new InvalidOperationException($"Service with id {service.ServiceId} already exists");
 		}
 		
 		service.Client = _client;
+		service.Initialize();
 	}
 
 	public void Remove(ServiceId serviceId)

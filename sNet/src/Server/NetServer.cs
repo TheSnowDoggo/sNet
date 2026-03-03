@@ -21,7 +21,7 @@ public sealed class NetServer
 		
 		public bool BeginReceiving()
 		{
-			return Interlocked.CompareExchange(ref _isReceiving, 1, 0) != 0;
+			return Interlocked.CompareExchange(ref _isReceiving, 1, 0) == 0;
 		}
 
 		public void EndReceiving()
@@ -60,7 +60,7 @@ public sealed class NetServer
 	public ClientStore Clients { get; }
 	public ServerServiceStore Services { get; }
 
-	public bool TryBind()
+	public bool Bind()
 	{
 		try
 		{
@@ -115,7 +115,7 @@ public sealed class NetServer
 			return false;
 		}
 		
-		if (Clients.TryGetClient(idx, out var client))
+		if (!Clients.TryGetClient(idx, out var client))
 		{
 			Logger.Error($"No such client {idx} found.");
 			return false;
@@ -240,6 +240,7 @@ public sealed class NetServer
 			
 			try
 			{
+				Services.ClientLeft(client);
 				ClientLeft?.Invoke(client);
 				
 				Clients.Remove(idx);
@@ -274,6 +275,7 @@ public sealed class NetServer
 				Clients.Add(client);
 				_clientInfo[client.Idx] = new ClientInfo(RentBuffer.Share(Constants.BufferSize));
 				
+				Services.ClientJoined(client);
 				ClientJoined?.Invoke(client);
 			}
 			catch (Exception ex)
@@ -333,7 +335,7 @@ public sealed class NetServer
 				{
 					int messageSize = stream.ReadNetInt32();
 
-					if (messageSize < 0 || messageSize > MaxReceiveSize)
+					if (messageSize <= 0 || messageSize > MaxReceiveSize)
 					{
 						Logger.Error($"Message size {messageSize} was invalid.");
 						info.EndReceiving();
@@ -364,7 +366,7 @@ public sealed class NetServer
 		}
 		catch (Exception ex)
 		{
-			Logger.Error(ex.Message);
+			Logger.Error(ex.ToString());
 			info.NetCall?.Dispose();
 			info.EndReceiving();
 		}
@@ -388,7 +390,7 @@ public sealed class NetServer
 		}
 		catch (Exception ex)
 		{
-			Logger.Error(ex.Message);
+			Logger.Error(ex.ToString());
 		}
 	}
 

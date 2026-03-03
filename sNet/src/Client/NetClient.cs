@@ -200,6 +200,8 @@ public sealed class NetClient
 		try
 		{
 			call.Stream.Seek(0, SeekOrigin.Begin);
+			
+			Services.Receive(call);
 		}
 		catch (Exception ex)
 		{

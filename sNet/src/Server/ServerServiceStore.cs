@@ -2,9 +2,9 @@
 
 namespace sNet.Server;
 
-public sealed class ServerServiceStore : IReadOnlyCollection<IServerService>
+public sealed class ServerServiceStore : IReadOnlyCollection<ServerService>
 {
-	private readonly Dictionary<ServiceId, IServerService> _services = [];
+	private readonly Dictionary<ServiceId, ServerService> _services = [];
 	
 	private readonly NetServer _server;
 
@@ -15,20 +15,20 @@ public sealed class ServerServiceStore : IReadOnlyCollection<IServerService>
 	
 	public int Count => _services.Count;
 	
-	public IServerService this[ServiceId serviceId] => _services[serviceId];
+	public ServerService this[ServiceId serviceId] => _services[serviceId];
 
-	public IServerService Get(ServiceId serviceId)
+	public ServerService Get(ServiceId serviceId)
 	{
 		return _services[serviceId];
 	}
 
 	public T Get<T>(ServiceId serviceId)
-		where T : IServerService
+		where T : ServerService
 	{
 		return (T)_services[serviceId];
 	}
 
-	public void Add(IServerService service)
+	public void Add(ServerService service)
 	{
 		if (!_services.TryAdd(service.ServiceId, service))
 		{
@@ -36,6 +36,7 @@ public sealed class ServerServiceStore : IReadOnlyCollection<IServerService>
 		}
 		
 		service.Server = _server;
+		service.Initialize();
 	}
 
 	public void Remove(ServiceId serviceId)
@@ -69,12 +70,28 @@ public sealed class ServerServiceStore : IReadOnlyCollection<IServerService>
 		}
 	}
 
+	public void ClientJoined(RemoteClient client)
+	{
+		foreach (var service in _services.Values)
+		{
+			service.ClientJoined(client);
+		}
+	}
+
+	public void ClientLeft(RemoteClient client)
+	{
+		foreach (var service in _services.Values)
+		{
+			service.ClientLeft(client);
+		}
+	}
+
 	public void Clear()
 	{
 		_services.Clear();
 	}
 
-	public IEnumerator<IServerService> GetEnumerator()
+	public IEnumerator<ServerService> GetEnumerator()
 	{
 		return _services.Values.GetEnumerator();
 	}

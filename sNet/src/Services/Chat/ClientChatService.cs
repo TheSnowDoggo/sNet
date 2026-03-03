@@ -10,7 +10,7 @@ public sealed class ClientChatService : ClientService
 	
 	public override void Receive(NetCall call)
 	{
-		var chatId = (ChatId)call.Stream.ReadByte();
+		var chatId = (ChatId)call.Stream.ReadExactByte();
 
 		switch (chatId)
 		{
@@ -27,13 +27,19 @@ public sealed class ClientChatService : ClientService
 	{
 		try
 		{
-
+			using var buffer = ChatService.FormatMessage(message);
+			return await Client.SendAsync(buffer);
 		}
 		catch (Exception ex)
 		{
-			Logger.Error(ex.ToString());
+			Logger.Error(ex.Message);
 			return false;
 		}
+	}
+
+	public void FireChat(string message)
+	{
+		Task.Run(() => SendChatAsync(message));
 	}
 
 	private void HandleChat(NetCall call)

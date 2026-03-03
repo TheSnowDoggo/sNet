@@ -11,6 +11,9 @@ public sealed class NetSerializer : IDisposable
 	
 	public int WrittenBytes { get; private set; }
 
+	/// <summary>
+	/// Makes room for the byte count header
+	/// </summary>
 	public void Begin()
 	{
 		_stream.Seek(sizeof(int), SeekOrigin.Begin);
@@ -39,6 +42,9 @@ public sealed class NetSerializer : IDisposable
 		WrittenBytes += _stream.WriteNetUtf8(value);
 	}
 
+	/// <summary>
+	/// Writes the byte count header at the start
+	/// </summary>
 	public void End()
 	{
 		_stream.Seek(0, SeekOrigin.Begin);
