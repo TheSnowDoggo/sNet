@@ -1,13 +1,21 @@
-﻿using System.Net;
+﻿using System.ComponentModel;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Unicode;
+using CScriptPro;
 
 namespace sNet;
 
 public static class SerialExtensions
 {
-	public static void WriteNetInt16(this Stream stream, short value)
+	public static int WriteBoolean(this Stream stream, bool value)
+	{
+		stream.WriteByte(Unsafe.BitCast<bool, byte>(value));
+		return sizeof(bool);
+	}
+	
+	public static int WriteNetInt16(this Stream stream, short value)
 	{
 		Span<byte> span = stackalloc byte[sizeof(short)];
 		
@@ -16,19 +24,23 @@ public static class SerialExtensions
 		Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(span), network);
 		
 		stream.Write(span);
+		
+		return sizeof(short);
 	}
 	
-	public static void WriteNetUInt16(this Stream stream, ushort value)
+	public static int WriteNetUInt16(this Stream stream, ushort value)
 	{
 		stream.WriteNetInt16(Unsafe.BitCast<ushort, short>(value));
+		return sizeof(ushort);
 	}
 	
-	public static void WriteNetChar(this Stream stream, char value)
+	public static int WriteNetChar(this Stream stream, char value)
 	{
 		stream.WriteNetInt16(Unsafe.BitCast<char, short>(value));
+		return sizeof(char);
 	}
 	
-	public static void WriteNetInt32(this Stream stream, int value)
+	public static int WriteNetInt32(this Stream stream, int value)
 	{
 		Span<byte> span = stackalloc byte[sizeof(int)];
 		
@@ -37,14 +49,22 @@ public static class SerialExtensions
 		Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(span), network);
 		
 		stream.Write(span);
+		return sizeof(int);
 	}
 	
-	public static void WriteNetUInt32(this Stream stream, uint value)
+	public static int WriteNetUInt32(this Stream stream, uint value)
 	{
 		stream.WriteNetInt32(Unsafe.BitCast<uint, int>(value));
+		return sizeof(uint);
+	}
+
+	public static int WriteNetSingle(this Stream stream, float value)
+	{
+		stream.WriteNetInt32(Unsafe.BitCast<float, int>(value));
+		return sizeof(float);
 	}
 	
-	public static void WriteNetInt64(this Stream stream, long value)
+	public static int WriteNetInt64(this Stream stream, long value)
 	{
 		Span<byte> span = stackalloc byte[sizeof(long)];
 		
@@ -53,11 +73,19 @@ public static class SerialExtensions
 		Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(span), network);
 		
 		stream.Write(span);
+		return sizeof(long);
 	}
 	
-	public static void WriteNetUInt64(this Stream stream, ulong value)
+	public static int WriteNetUInt64(this Stream stream, ulong value)
 	{
 		stream.WriteNetInt64(Unsafe.BitCast<ulong, long>(value));
+		return sizeof(ulong);
+	}
+	
+	public static int WriteNetDouble(this Stream stream, double value)
+	{
+		stream.WriteNetInt64(Unsafe.BitCast<double, long>(value));
+		return sizeof(double);
 	}
 	
 	public static int WriteNetUtf8(this Stream stream, string value)
@@ -104,6 +132,57 @@ public static class SerialExtensions
 		return sizeof(int) + value.Length * sizeof(char);
 	}
 
+	public static int WriteCObject(this Stream stream, CObject obj)
+	{
+		stream.WriteByte((byte)obj.TypeId);
+
+		return sizeof(byte) + obj.TypeId switch
+		{
+			TypeId.Nil => 0,
+			TypeId.Number => stream.WriteNetDouble((Number)obj),
+			TypeId.String => stream.WriteNetUtf8((CString)obj),
+			TypeId.Bool => stream.WriteBoolean((Bool)obj),
+			TypeId.Array => stream.WriteCArray((CArrayBase)obj),
+			TypeId.Table => stream.WriteTable((ReadOnlyTable)obj),
+			TypeId.Vec2 => stream.WriteVec2((CVec2)obj),
+			_ => throw new ArgumentException($"{obj.TypeId} is not serializable."),
+		};
+	}
+
+	public static int WriteCArray(this Stream stream, CArrayBase value)
+	{
+		stream.WriteNetInt32(value.Count);
+
+		int written = sizeof(int);
+		
+		foreach (var item in value)
+		{
+			written += stream.WriteCObject(item);
+		}
+
+		return written;
+	}
+
+	public static int WriteTable(this Stream stream, ReadOnlyTable value)
+	{
+		stream.WriteNetInt32(value.Count);
+		
+		int written = sizeof(int);
+
+		foreach (var kvp in value)
+		{
+			written += stream.WriteCObject(kvp.Key);
+			written += stream.WriteCObject(kvp.Value);
+		}
+
+		return written;
+	}
+
+	public static int WriteVec2(this Stream stream, Vec2 value)
+	{
+		return stream.WriteNetDouble(value.X) + stream.WriteNetDouble(value.Y);
+	}
+
 	public static byte ReadExactByte(this Stream stream)
 	{
 		int value = stream.ReadByte();
@@ -114,6 +193,11 @@ public static class SerialExtensions
 		}
 		
 		return (byte)value;
+	}
+
+	public static bool ReadBoolean(this Stream stream)
+	{
+		return Unsafe.BitCast<byte, bool>(stream.ReadExactByte());
 	}
 
 	public static short ReadNetInt16(this Stream stream)
@@ -152,6 +236,11 @@ public static class SerialExtensions
 	{
 		return Unsafe.BitCast<int, uint>(stream.ReadNetInt32());
 	}
+
+	public static float ReadNetSingle(this Stream stream)
+	{
+		return Unsafe.BitCast<int, float>(stream.ReadNetInt32());
+	}
 	
 	public static long ReadNetInt64(this Stream stream)
 	{
@@ -167,6 +256,11 @@ public static class SerialExtensions
 	public static ulong ReadNetUInt64(this Stream stream)
 	{
 		return Unsafe.BitCast<long, ulong>(stream.ReadNetInt64());
+	}
+
+	public static double ReadNetDouble(this Stream stream)
+	{
+		return Unsafe.BitCast<long, double>(stream.ReadNetInt64());
 	}
 	
 	public static string ReadNetUtf8(this Stream stream)
@@ -214,5 +308,74 @@ public static class SerialExtensions
 				span[i] = state.ReadNetChar();
 			}
 		}
+	}
+
+	public static CObject ReadCObject(this Stream stream)
+	{
+		var typeId = (TypeId)stream.ReadExactByte();
+
+		return typeId switch
+		{
+			TypeId.Nil => Nil.Instance,
+			TypeId.Number => stream.ReadNetDouble(),
+			TypeId.String => stream.ReadNetUtf8(),
+			TypeId.Bool => stream.ReadBoolean(),
+			TypeId.Array => stream.ReadCArray(),
+			TypeId.Table => stream.ReadTable(),
+			TypeId.Vec2 => stream.ReadVec2(),
+			_ => throw new InvalidEnumArgumentException(nameof(typeId), (int)typeId, typeof(TypeId)),
+		};
+	}
+	
+	public static UserCArray ReadCArray(this Stream stream)
+	{
+		int count = stream.ReadNetInt32();
+
+		if (count < 0)
+		{
+			throw new InvalidDataException($"Array size (\'{count}\') was negative.");
+		}
+
+		var data = new List<CObject>(count);
+
+		for (int i = 0; i < count; i++)
+		{
+			data.Add(stream.ReadCObject());
+		}
+		
+		return new UserCArray(data);
+	}
+
+	public static UserTable ReadTable(this Stream stream)
+	{
+		int count = stream.ReadNetInt32();
+
+		if (count < 0)
+		{
+			throw new InvalidDataException($"Table size (\'{count}\') was negative.");
+		}
+
+		var data = new Dictionary<CObject, CObject>(count);
+
+		for (int i = 0; i < count; i++)
+		{
+			var key = stream.ReadCObject();
+			var value = stream.ReadCObject();
+
+			if (!data.TryAdd(key, value))
+			{
+				throw new InvalidDataException($"Table contained duplicate key {key} for value {value}.");
+			}
+		}
+		
+		return new UserTable(data);
+	}
+
+	public static Vec2 ReadVec2(this Stream stream)
+	{
+		var x = stream.ReadNetDouble();
+		var y = stream.ReadNetDouble();
+		
+		return new Vec2(x, y);
 	}
 }

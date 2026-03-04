@@ -7,4 +7,10 @@
         <Nullable>disable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Reference Include="cscriptpro">
+        <HintPath>..\..\CScriptPro\CScriptPro\bin\Debug\net9.0\cscriptpro.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

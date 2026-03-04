@@ -1,4 +1,6 @@
-﻿namespace sNet;
+﻿using CScriptPro;
+
+namespace sNet;
 
 public sealed class NetSerializer : IDisposable
 {
@@ -25,46 +27,54 @@ public sealed class NetSerializer : IDisposable
 		WrittenBytes += sizeof(byte);
 	}
 	
+	public void WriteBoolean(bool value)
+	{
+		WrittenBytes += _stream.WriteBoolean(value);
+	}
+	
 	public void WriteInt16(short value)
 	{
-		_stream.WriteNetInt16(value);
-		WrittenBytes += sizeof(short);
+		WrittenBytes += _stream.WriteNetInt16(value);
 	}
 	
 	public void WriteUInt16(ushort value)
 	{
-		_stream.WriteNetUInt16(value);
-		WrittenBytes += sizeof(ushort);
+		WrittenBytes += _stream.WriteNetUInt16(value);
 	}
 	
 	public void WriteChar(char value)
 	{
-		_stream.WriteNetChar(value);
-		WrittenBytes += sizeof(char);
+		WrittenBytes += _stream.WriteNetChar(value);
 	}
 
 	public void WriteInt32(int value)
 	{
-		_stream.WriteNetInt32(value);
-		WrittenBytes += sizeof(int);
+		WrittenBytes += _stream.WriteNetInt32(value);
 	}
 
 	public void WriteUInt32(uint value)
 	{
-		_stream.WriteNetUInt32(value);
-		WrittenBytes += sizeof(uint);
+		WrittenBytes += _stream.WriteNetUInt32(value);
+	}
+	
+	public void WriteSingle(float value)
+	{
+		WrittenBytes += _stream.WriteNetSingle(value);
 	}
 
 	public void WriteInt64(long value)
 	{
-		_stream.WriteNetInt64(value);
-		WrittenBytes += sizeof(long);
+		WrittenBytes += _stream.WriteNetInt64(value);
 	}
 
 	public void WriteUInt64(ulong value)
 	{
-		_stream.WriteNetUInt64(value);
-		WrittenBytes += sizeof(ulong);
+		WrittenBytes += _stream.WriteNetUInt64(value);
+	}
+	
+	public void WriteDouble(double value)
+	{
+		WrittenBytes += _stream.WriteNetDouble(value);
 	}
 
 	public void WriteUtf8(string value)
@@ -75,6 +85,11 @@ public sealed class NetSerializer : IDisposable
 	public void WriteUtf16(string value)
 	{
 		WrittenBytes += _stream.WriteNetUtf16(value);
+	}
+
+	public void WriteCObject(CObject obj)
+	{
+		WrittenBytes += _stream.WriteCObject(obj);
 	}
 
 	/// <summary>
