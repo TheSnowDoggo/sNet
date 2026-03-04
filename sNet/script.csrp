@@ -8,4 +8,4 @@ const table = {
     long_msg = "this is a really long message to see the size go big",
 };
 
-return table;
+return [table, 2];
