@@ -6,11 +6,6 @@ const table = {
     },
     datapoints = [{ another = "hello" }, 234423, Vec2.new(34, 21)],
     long_msg = "this is a really long message to see the size go big",
-    big_data = [],
 };
-
-for let i = 0; i < 100; i += 1 {
-    table.big_data.add("hghiosadfojasd");
-}
 
 return table;
