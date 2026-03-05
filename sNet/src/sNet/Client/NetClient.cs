@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using Serial;
 
 namespace sNet.Client;
 

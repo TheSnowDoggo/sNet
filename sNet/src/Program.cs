@@ -1,5 +1,4 @@
-﻿using CScriptPro;
-using sNet.Client;
+﻿using sNet.Client;
 using sNet.Server;
 using sNet.Services.Chat;
 
@@ -9,27 +8,6 @@ internal static class Program
 {
 	private static void Main()
 	{
-		const string Path = @"C:\Users\redst\RiderProjects\sNet\sNet\script.csrp";
-
-		var function = FunctionDefinition.ParseMain(Path).Create();
-		
-		using var buffer = RentBuffer.Share(4096);
-
-		using (var serial = new NetSerializer(buffer.Open()))
-		{
-			serial.WriteCObject(function.Run());
-			buffer.Trim(serial.WrittenBytes);
-		}
-
-		using (var serial = buffer.OpenRead())
-		{
-			var obj = serial.ReadCObject();
-
-			Console.WriteLine(obj);
-		}
-		
-		return;
-		
 		var server = new NetServer(2);
 		server.Services.Add(new ServerChatService());
 

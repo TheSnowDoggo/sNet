@@ -11,6 +11,9 @@
       <Reference Include="cscriptpro">
         <HintPath>..\..\CScriptPro\CScriptPro\bin\Debug\net9.0\cscriptpro.dll</HintPath>
       </Reference>
+      <Reference Include="Serial">
+        <HintPath>..\..\Serial\Serial\bin\Debug\net9.0\Serial.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

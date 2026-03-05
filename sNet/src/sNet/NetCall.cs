@@ -1,4 +1,6 @@
-﻿namespace sNet;
+﻿using Serial;
+
+namespace sNet;
 
 public class NetCall : IDisposable
 {

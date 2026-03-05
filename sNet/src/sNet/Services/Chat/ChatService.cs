@@ -1,4 +1,6 @@
-﻿namespace sNet.Services.Chat;
+﻿using Serial;
+
+namespace sNet.Services.Chat;
 
 public static class ChatService
 {

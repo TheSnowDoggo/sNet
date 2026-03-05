@@ -1,4 +1,5 @@
 ﻿using sNet.Client;
+using Serial;
 
 namespace sNet.Services.Chat;
 
