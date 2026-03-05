@@ -87,7 +87,7 @@ public sealed class NetSerializer : IDisposable
 		WrittenBytes += _stream.WriteNetUtf16(value);
 	}
 
-	public void WriteCObject(CObject obj)
+	public void WriteCObject(CObj obj)
 	{
 		WrittenBytes += _stream.WriteCObject(obj);
 	}
