@@ -4,6 +4,8 @@ public sealed class AddNetPack : INetSerializable
 {
     private Queue<Part> _queue = [];
 
+    public bool IsEmpty => _queue.Count == 0;
+
     public void Enqueue(Part part)
     {
         _queue.Enqueue(part);

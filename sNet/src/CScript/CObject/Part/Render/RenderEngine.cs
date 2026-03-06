@@ -15,6 +15,7 @@ public sealed class RenderEngine
 		public IRenderable Renderable { get; init; }
 		public Vector2 Position { get; init; }
 		public double Layer { get; init; }
+		public Anchor Anchor { get; init; }
 
 		public int CompareTo(InputInfo other)
 		{
@@ -80,7 +81,7 @@ public sealed class RenderEngine
 				var size = inInfo.Renderable.Size();
 				
 				Vec2I screenOffset = (Vec2I)(inInfo.Position.Rounded() - outInfo.Position.Rounded());
-				screenOffset += inInfo.Renderable.Offset + inInfo.Renderable.Anchor.AnchorDimension(size) - size;
+				screenOffset += inInfo.Renderable.Offset + inInfo.Anchor.AnchorDimension(size) - size;
 				
 				Vec2I screenEnd = screenOffset + screenOffset;
 
@@ -164,11 +165,17 @@ public sealed class RenderEngine
 
 		var renderable = render2d.Render();
 
+		if (renderable == null)
+		{
+			return;
+		}
+
 		var input = new InputInfo()
 		{
 			Renderable = renderable,
 			Position = render2d.GlobalPosition,
 			Layer = render2d.Layer,
+			Anchor = anchor,
 		};
 		
 		_inputs.Add(input);

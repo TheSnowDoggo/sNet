@@ -19,9 +19,9 @@ public sealed class ServerPartRoot : PartRoot
 			return;
 		}
 
-		Service.FireBroadcast(PartSid.Remove, RemoveNetPack, ServerPartService.MaxRemoveSize);
-		Service.FireBroadcast(PartSid.Add, AddNetPack, ServerPartService.MaxAddSize);
-		Service.FireBroadcast(PartSid.Update, UpdateNetPack, ServerPartService.MaxUpdateSize);
+		Service.BroadcastAsync(PartSid.Remove, RemoveNetPack, ServerPartService.MaxRemoveSize).Wait();
+		Service.BroadcastAsync(PartSid.Add, AddNetPack, ServerPartService.MaxAddSize).Wait();
+		Service.BroadcastAsync(PartSid.Update, UpdateNetPack, ServerPartService.MaxUpdateSize).Wait();
 	}
 
 	public override void PartAdded(Part root)
@@ -40,8 +40,8 @@ public sealed class ServerPartRoot : PartRoot
 				continue;
 			}
 
-			part.Uid = _registry.AddNew(part);
 			part.Root = this;
+			part.Uid = _registry.AddNew(part);
 		}
 		
 		if (Service != null)

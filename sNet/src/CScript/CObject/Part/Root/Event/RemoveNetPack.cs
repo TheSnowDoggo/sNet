@@ -4,6 +4,8 @@ public sealed class RemoveNetPack : INetSerializable
 {
 	private HashSet<Uid> _removes = [];
 
+	public bool IsEmpty => _removes.Count == 0;
+	
 	public bool Enqueue(Uid part)
 	{
 		return _removes.Add(part);	

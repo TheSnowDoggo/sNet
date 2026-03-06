@@ -221,7 +221,7 @@ public sealed class NetServer
 		
 		_joinQueue.Enqueue(client);
 	}
-
+	
 	private void ProcessQuits()
 	{
 		var seen = new HashSet<int>();
@@ -339,7 +339,7 @@ public sealed class NetServer
 					if (messageSize <= 0 || messageSize > MaxReceiveSize)
 					{
 						Logger.Error($"Message size {messageSize} was invalid.");
-						info.EndReceiving();
+						_quitQueue.Enqueue(client.Idx);
 						break;
 					}
 					

@@ -284,7 +284,18 @@ public static class SerialExtensions
 	public static string ReadNetUtf8(this Stream stream)
 	{
 		int utf8Bytes = stream.ReadNetInt32();
+
+		if (utf8Bytes < 0)
+		{
+			throw new InvalidDataException($"Utf8 length (\'{utf8Bytes}\') was invalid.");
+		}
+		
 		int utf16Bytes = stream.ReadNetInt32();
+		
+		if (utf16Bytes < 0)
+		{
+			throw new InvalidDataException($"Utf16 length (\'{utf8Bytes}\') was invalid.");
+		}
 
 		if (utf8Bytes == 0)
 		{

@@ -34,14 +34,14 @@ public sealed class ClientPartRoot : PartRoot
 				Logger.Error($"Failed to add part: No parent found with uid {parentUid}.");
 				continue;
 			}
-			
-			if (!_registry.TryAdd(part.Uid, part))
+
+			if (!parent.AddChild(part))
 			{
-				Logger.Error($"Failed to add part: Part with uid {part.Uid} already exists.");
+				Logger.Error("Failed to add part.");
 				continue;
 			}
-			
-			parent.AddChild(part);
+
+			Register(part);
 		}
 	}
 
@@ -64,7 +64,10 @@ public sealed class ClientPartRoot : PartRoot
 			if (!part.Parent.RemoveChild(part))
 			{
 				Logger.Error("Failed to remove part: Part not found in parent.");
+				continue;
 			}
+
+			Unregister(part);
 		}
 	}
 
@@ -83,6 +86,34 @@ public sealed class ClientPartRoot : PartRoot
 			foreach (var updateEvent in updates)
 			{
 				part[updateEvent.Name] = updateEvent.Value;
+			}
+		}
+	}
+
+	private void Register(Part root)
+	{
+		foreach (var part in root.Descendants())
+		{
+			if (part.Uid == Uid.Null)
+			{
+				Logger.Error($"Failed to register part {part.Name}: Uid was null.");
+				continue;
+			}
+			
+			if (!_registry.TryAdd(part.Uid, part))
+			{
+				Logger.Error($"Failed to register part {part.Name}: Part with uid {part.Uid} already exists.");
+			}
+		}
+	}
+	
+	private void Unregister(Part root)
+	{
+		foreach (var part in root.Descendants())
+		{
+			if (_registry.Remove(part.Uid))
+			{
+				Logger.Error($"Failed to unregister part: Uid {part.Uid} not found.");
 			}
 		}
 	}

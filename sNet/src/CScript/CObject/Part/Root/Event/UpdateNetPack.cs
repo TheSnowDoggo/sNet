@@ -2,7 +2,11 @@
 
 public sealed class UpdateNetPack : INetSerializable
 {
+	private readonly Lock _lock	= new Lock();
+	
 	private UidRegistry<Dictionary<string, Obj>> _data = [];
+	
+	public bool IsEmpty => _data.Count == 0;
 	
 	public void Enqueue(Uid uid, string name, Obj obj)
 	{

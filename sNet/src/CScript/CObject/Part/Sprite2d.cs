@@ -1,9 +1,12 @@
 ﻿using SCENeo;
+using SCENeo.Ui;
 
 namespace sNet.CScriptPro;
 
 public sealed class Sprite2d : Render2d
 {
+	private DisplayMap _data;
+	
 	public StrObj _source;
 
 	public StrObj Source
@@ -39,7 +42,17 @@ public sealed class Sprite2d : Render2d
 
 	public override IRenderable Render()
 	{
-		throw new NotImplementedException();
+		if (_data != null)
+		{
+			return _data;
+		}
+
+		if (!ImageLoader.Default.TryGet(_source, out var image))
+		{
+			return null;
+		}
+		
+		return _data = new DisplayMap(image);
 	}
 
 	public override int Serialize(Stream stream)

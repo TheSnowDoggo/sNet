@@ -8,13 +8,13 @@ public sealed class ServerPartService : ServerService
     
     public override ServiceId ServiceId => ServiceId.Part;
 
-    public void FireBroadcast(PartSid sid, INetSerializable data, int maxSize)
-    {
-        Task.Run(() => BroadcastAsync(sid, data, maxSize));
-    }
-    
     public async Task<bool> BroadcastAsync(PartSid sid, INetSerializable data, int maxSize)
     {
+        if (data.IsEmpty)
+        {
+            return false;
+        }
+        
         try
         {
             using var buffer = Format(sid, data, maxSize);

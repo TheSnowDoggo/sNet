@@ -172,20 +172,25 @@ public class Part : Obj
 
 	public virtual int Serialize(Stream stream)
 	{
-		int written = stream.WriteNetByte((byte)PartType) + stream.WriteNetUtf8(Name) + stream.WriteBoolean(Enabled);
+		int bytes = stream.WriteNetByte((byte)PartType);
 
-		written += stream.WriteNetInt32(_children.Count);
+		bytes += stream.WriteNetInt64(Uid);
+		bytes += stream.WriteNetUtf8(Name);
+		bytes += stream.WriteBoolean(Enabled);
+
+		bytes += stream.WriteNetInt32(_children.Count);
 		
 		foreach (var child in _children)
 		{
-			written += child.Serialize(stream);
+			bytes += child.Serialize(stream);
 		}
 		
-		return written;
+		return bytes;
 	}
 
 	public virtual void Deserialize(Stream stream)
 	{
+		Uid = stream.ReadNetInt64();
 		Name = stream.ReadNetUtf8();
 		Enabled = stream.ReadBoolean();
 
