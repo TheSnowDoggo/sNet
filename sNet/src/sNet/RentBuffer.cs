@@ -60,6 +60,11 @@ public sealed class RentBuffer : IDisposable
 		return new MemoryStream(Data, 0, End, writable);
 	}
 
+	public NetSerializer OpenSerial()
+	{
+		return new NetSerializer(Open());
+	}
+
 	public MemoryStream OpenRead()
 	{
 		return Open(false);

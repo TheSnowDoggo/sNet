@@ -1,6 +1,6 @@
 ﻿namespace sNet.CScriptPro;
 
-public sealed class TableDefinition : CObj
+public sealed class TableDefinition : Obj
 {
 	public sealed record Pair(List<CsrToken> KeyExpression, List<CsrToken> ValueExpression);
 
@@ -35,7 +35,7 @@ public sealed class TableDefinition : CObj
 				break;
 			case CsrId.Identifier:
 				head.Type = CsrId.Literal;
-				head.Value = (CStr)head.Lexeme;
+				head.Value = (StrObj)head.Lexeme;
 				
 				keyExpr = [head];
 				
@@ -46,7 +46,7 @@ public sealed class TableDefinition : CObj
 			case CsrId.Function:
 				var name = stream.Consume(CsrId.Identifier);
 				name.Type = CsrId.Literal;
-				name.Value = (CStr)name.Lexeme;
+				name.Value = (StrObj)name.Lexeme;
 
 				keyExpr = [name];
 				valExpr = [FunctionDefinition.ParseLambda(stream).ToToken(stream.Line)];

@@ -4,10 +4,10 @@ namespace sNet.CScriptPro;
 
 public static class Global
 {
-    public static readonly FrozenDictionary<string, CObj> Exports = new Dictionary<string, CObj>()
+    public static readonly FrozenDictionary<string, Obj> Exports = new Dictionary<string, Obj>()
     {
-        { "Vec2", CVec2.Export },
+        { "Vec2", Vec2Obj.Export },
         { "Part", Part.Export },
-        { "Uid", CUid.Export },
+        { "Uid", UidObj.Export },
     }.ToFrozenDictionary();
 }

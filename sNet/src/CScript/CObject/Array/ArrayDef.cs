@@ -1,6 +1,6 @@
 ﻿namespace sNet.CScriptPro;
 
-public sealed class ArrayDef : CObj
+public sealed class ArrayDef : Obj
 {
 	public ArrayDef() : base(TypeId.Nil) { }
 	
@@ -37,16 +37,16 @@ public sealed class ArrayDef : CObj
 		};
 	}
 
-	public UserArray Create(Context context)
+	public ArrayObj Create(Context context)
 	{
-		var list = new List<CObj>(Expressions.Count);
+		var list = new List<Obj>(Expressions.Count);
 
 		foreach (var expression in Expressions)
 		{
 			list.Add(new Evaluator(context, expression).Evaluate());
 		}
 		
-		return new UserArray(list);
+		return new ArrayObj(list);
 	}
 	
 	public CsrToken ToToken(int line)

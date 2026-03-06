@@ -2,9 +2,9 @@
 
 public sealed class Script : Part
 {
-	private CStr _source = CStr.Empty;
+	private StrObj _source = StrObj.Empty;
 
-	public CStr Source
+	public StrObj Source
 	{
 		get => _source;
 		set => ObserveSet(ref _source, value, "source");
@@ -14,7 +14,7 @@ public sealed class Script : Part
 
 	protected override string[] Properties => [..base.Properties, "source"];
 
-	public override CObj this[CObj key]
+	public override Obj this[Obj key]
 	{
 		get => key.TypeId != TypeId.String ? Nil.Value : (string)key switch
 		{
@@ -28,7 +28,7 @@ public sealed class Script : Part
 			switch ((string)key)
 			{
 			case "source":
-				Source = (CStr)value.Expect(TypeId.String);
+				Source = (StrObj)value.Expect(TypeId.String);
 				break;
 			default:
 				base[key] = value;

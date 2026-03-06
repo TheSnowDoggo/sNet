@@ -13,7 +13,7 @@ public sealed class Context
     public int Line { get; set; } = 1;
     public Context Parent { get; }
 
-    public CObj this[string name]
+    public Obj this[string name]
     {
         get
         {
@@ -78,7 +78,7 @@ public sealed class Context
         }
     }
     
-    public void Define(string name, CObj value, VariableAttribute attributes = VariableAttribute.None)
+    public void Define(string name, Obj value, VariableAttribute attributes = VariableAttribute.None)
     {
         if (!_scopes.TryPeek(out var scope))
         {

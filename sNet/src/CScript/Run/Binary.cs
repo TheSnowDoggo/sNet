@@ -1,3 +1,3 @@
 namespace sNet.CScriptPro;
 
-public delegate CObj Binary(CObj left, CObj right);
+public delegate Obj Binary(Obj left, Obj right);

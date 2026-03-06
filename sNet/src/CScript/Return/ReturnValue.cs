@@ -2,7 +2,7 @@ namespace sNet.CScriptPro;
 
 public sealed class ReturnValue
 {
-    public ReturnValue(ReturnType type, CObj value = null)
+    public ReturnValue(ReturnType type, Obj value = null)
     {
         Type = type;
         Value = value;
@@ -13,5 +13,5 @@ public sealed class ReturnValue
     public static ReturnValue Continue { get; } = new ReturnValue(ReturnType.Continue);
     
     public ReturnType Type { get; }
-    public CObj Value { get; }
+    public Obj Value { get; }
 }

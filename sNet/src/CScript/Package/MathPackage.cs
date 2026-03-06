@@ -5,7 +5,7 @@ namespace sNet.CScriptPro;
 
 public sealed class MathPackage : Package
 {
-	public static readonly ReadOnlyTable Exports = new Dictionary<CObj, CObj>()
+	public static readonly ReadOnlyTable Exports = new Dictionary<Obj, Obj>()
 	{
 		{ "PI", Math.PI },
 		{ "E", Math.E },
@@ -57,13 +57,13 @@ public sealed class MathPackage : Package
 	}.ToFrozenDictionary();
 	
 	public override string Name => "Math";
-	public override CObj Export => Exports;
+	public override Obj Export => Exports;
 
 	private static GlobalFunction CreateUnary(Func<double, double> func)
 	{
 		return GlobalFunction.Create(Func, TypeId.Number);
 		
-		Number Func(CObj[] args)
+		Number Func(Obj[] args)
 		{
 			return func.Invoke((double)(Number)args[0]);
 		}
@@ -73,7 +73,7 @@ public sealed class MathPackage : Package
 	{
 		return GlobalFunction.Create(Func, TypeId.Number, TypeId.Number);
 
-		Number Func(CObj[] args)
+		Number Func(Obj[] args)
 		{
 			return func.Invoke((double)args[0], (double)args[1]);
 		}
@@ -83,7 +83,7 @@ public sealed class MathPackage : Package
 	{
 		return GlobalFunction.Create(Func, TypeId.Number, TypeId.Number, TypeId.Number);
 		
-		Number Func(CObj[] args)
+		Number Func(Obj[] args)
 		{
 			return func.Invoke((double)args[0], (double)args[1], (double)args[2]);
 		}
@@ -99,19 +99,19 @@ public sealed class MathPackage : Package
 		return deg * Math.PI / 180;
 	}
 
-	private static Number Round(CObj[] args)
+	private static Number Round(Obj[] args)
 	{
 		int digits = args.Length > 1 ? (int)args[1] : 0;
 		
 		return Math.Round((double)args[0], digits);
 	}
 	
-	private static Number Log(CObj[] args)
+	private static Number Log(Obj[] args)
 	{
 		return Math.Log((double)args[0], (double)args[1]);
 	}
 
-	private static Number Logb2(CObj[] args)
+	private static Number Logb2(Obj[] args)
 	{
 		return Math.ILogB((double)args[0]);
 	}
@@ -127,7 +127,7 @@ public sealed class MathPackage : Package
 		return (value - min) / (max - min);
 	}
 	
-	private static Bool IsPrime(CObj[] args)
+	private static Bool IsPrime(Obj[] args)
 	{
 		long x = (long)args[0];
 
@@ -154,13 +154,13 @@ public sealed class MathPackage : Package
 		return true;
 	}
 
-	private static UserArray GetPrimes(CObj[] args)
+	private static ArrayObj GetPrimes(Obj[] args)
 	{
 		var n = (long)args[0];
 
 		if (n <= 1)
 		{
-			return new UserArray();
+			return new ArrayObj();
 		}
 
 		var primes = new List<Number>() { 2 };
@@ -195,6 +195,6 @@ public sealed class MathPackage : Package
 			}
 		}
 
-		return new UserArray(primes);
+		return new ArrayObj(primes);
 	}
 }

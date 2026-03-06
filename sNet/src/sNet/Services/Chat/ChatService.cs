@@ -1,4 +1,4 @@
-﻿namespace sNet.Services.Chat;
+﻿namespace sNet.Service.Chat;
 
 public static class ChatService
 {

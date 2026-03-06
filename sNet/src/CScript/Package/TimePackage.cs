@@ -5,19 +5,19 @@ namespace sNet.CScriptPro;
 
 public sealed class TimePackage : Package
 {
-	public static readonly ReadOnlyTable Exports = new Dictionary<CObj, CObj>()
+	public static readonly ReadOnlyTable Exports = new Dictionary<Obj, Obj>()
 	{
 		{ "unix", GlobalFunction.Create(Unix, 0, 1, TypeId.String) },
 		{ "wait", GlobalFunction.Create(Wait, 1, 2, TypeId.Number, TypeId.String) },
 	}.ToFrozenDictionary();
 
 	public override string Name => "Time";
-	public override CObj Export => Exports;
+	public override Obj Export => Exports;
 
-	private static Number Unix(CObj[] args)
+	private static Number Unix(Obj[] args)
 	{
 		var unix = DateTime.Now - DateTime.UnixEpoch;
-		string prefix = args.Length > 0 ? (CStr)args[0] : "s";
+		string prefix = args.Length > 0 ? (StrObj)args[0] : "s";
 		
 		return prefix switch
 		{
@@ -32,10 +32,10 @@ public sealed class TimePackage : Package
 		};
 	}
 
-	private static CObj Wait(CObj[] args)
+	private static Obj Wait(Obj[] args)
 	{
 		double period = (Number)args[0];
-		string prefix = args.Length > 1 ? (CStr)args[1] : "ms";
+		string prefix = args.Length > 1 ? (StrObj)args[1] : "ms";
 
 		var sw = Stopwatch.StartNew();
 

@@ -1,6 +1,6 @@
 ﻿namespace sNet.CScriptPro;
 
-public abstract class Function : CObj
+public abstract class Function : Obj
 {
 	public const int AnyArgs = -1;
 	
@@ -10,7 +10,7 @@ public abstract class Function : CObj
 	public int MaxArgs { get; init; }
 	public TypeId[] ArgTypes { get; init; }
 
-	public CObj Run(CObj[] args)
+	public Obj Run(Obj[] args)
 	{
 		if (args.Length < MinArgs)
 		{
@@ -30,14 +30,14 @@ public abstract class Function : CObj
 		return Invoke(args);
 	}
 	
-	public CObj Run()
+	public Obj Run()
 	{
 		return Run([]);
 	}
 
-	protected abstract CObj Invoke(CObj[] args);
+	protected abstract Obj Invoke(Obj[] args);
 
-	private void ValidateArguments(CObj[] args)
+	private void ValidateArguments(Obj[] args)
 	{
 		int count = Math.Min(args.Length, ArgTypes.Length);
 		

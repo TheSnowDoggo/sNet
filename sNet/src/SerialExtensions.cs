@@ -138,7 +138,7 @@ public static class SerialExtensions
 		return sizeof(int) + value.Length * sizeof(char);
 	}
 	
-	public static int WriteCObj(this Stream stream, CObj obj)
+	public static int WriteCObj(this Stream stream, Obj obj)
 	{
 		stream.WriteByte((byte)obj.TypeId);
 
@@ -146,24 +146,24 @@ public static class SerialExtensions
 		{
 			TypeId.Nil => 0,
 			TypeId.Number => stream.WriteNetDouble((Number)obj),
-			TypeId.String => stream.WriteNetUtf8((CStr)obj),
+			TypeId.String => stream.WriteNetUtf8((StrObj)obj),
 			TypeId.Bool => stream.WriteBoolean((Bool)obj),
-			TypeId.Array => stream.WriteArray((UserArray)obj),
+			TypeId.Array => stream.WriteArray((ArrayObj)obj),
 			TypeId.Table => stream.WriteTable((UserTable)obj),
-			TypeId.Vec2 => stream.WriteVec2((CVec2)obj),
+			TypeId.Vec2 => stream.WriteVec2((Vec2Obj)obj),
 			TypeId.Part => stream.WritePart((Part)obj),
-			TypeId.Uid => stream.WriteUid((CUid)obj),
+			TypeId.Uid => stream.WriteUid((UidObj)obj),
 			_ => throw new InvalidOperationException($"Cannot serialize type {obj.TypeId}."),
 		};
 	}
 
-	public static int WriteArray(this Stream stream, UserArray array)
+	public static int WriteArray(this Stream stream, ArrayObj arrayObj)
 	{
-		stream.WriteNetInt32(array.Count);
+		stream.WriteNetInt32(arrayObj.Count);
 
 		int written = sizeof(int);
 
-		foreach (var item in array)
+		foreach (var item in arrayObj)
 		{
 			written += stream.WriteCObj(item);
 		}
@@ -328,7 +328,7 @@ public static class SerialExtensions
 		}
 	}
 	
-	public static CObj ReadCObj(this Stream stream)
+	public static Obj ReadCObj(this Stream stream)
 	{
 		var type = (TypeId)stream.ReadByte();
 
@@ -347,7 +347,7 @@ public static class SerialExtensions
 		};
 	}
 	
-	public static UserArray ReadArray(this Stream stream)
+	public static ArrayObj ReadArray(this Stream stream)
 	{
 		int count = stream.ReadNetInt32();
 
@@ -356,14 +356,14 @@ public static class SerialExtensions
 			throw new InvalidDataException($"Array count (\'{count}\') was negative.");
 		}
 
-		var list = new List<CObj>(count);
+		var list = new List<Obj>(count);
 
 		for (int i = 0; i < count; i++)
 		{
 			list.Add(stream.ReadCObj());
 		}
 
-		return new UserArray(list);
+		return new ArrayObj(list);
 	}
 
 	public static UserTable ReadTable(this Stream stream)
@@ -375,7 +375,7 @@ public static class SerialExtensions
 			throw new InvalidDataException($"Table count (\'{count}\') was negative.");
 		}
 
-		var data = new Dictionary<CObj, CObj>();
+		var data = new Dictionary<Obj, Obj>();
 
 		for (int i = 0; i < count; i++)
 		{
@@ -391,11 +391,11 @@ public static class SerialExtensions
 		return new UserTable(data);
 	}
 
-	public static CVec2 ReadVec2(this Stream stream)
+	public static Vec2Obj ReadVec2(this Stream stream)
 	{
 		var x = stream.ReadNetDouble();
 		var y = stream.ReadNetDouble();
-		return new CVec2(x, y);
+		return new Vec2Obj(x, y);
 	}
 
 	public static Part ReadPart(this Stream stream)
@@ -403,7 +403,7 @@ public static class SerialExtensions
 		return Part.DeserializeNew(stream);
 	}
 
-	public static CUid ReadUid(this Stream stream)
+	public static UidObj ReadUid(this Stream stream)
 	{
 		return (Uid)stream.ReadNetInt64();
 	}

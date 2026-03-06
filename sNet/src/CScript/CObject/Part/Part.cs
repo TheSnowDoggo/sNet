@@ -4,11 +4,11 @@ using System.Text;
 
 namespace sNet.CScriptPro;
 
-public class Part : CObj
+public class Part : Obj
 {
 	private readonly List<Part> _children = [];
 	
-	public static readonly ReadOnlyTable Export = new Dictionary<CObj, CObj>()
+	public static readonly ReadOnlyTable Export = new Dictionary<Obj, Obj>()
 	{
 		{ "new", GlobalFunction.Create(New, TypeId.String) },
 		{ "load", GlobalFunction.Create(Load, TypeId.String) },
@@ -21,9 +21,9 @@ public class Part : CObj
 	
 	public IReadOnlyList<Part> Children => _children.AsReadOnly();
 
-	private CStr _name = CStr.Empty;
+	private StrObj _name = StrObj.Empty;
 
-	public CStr Name
+	public StrObj Name
 	{
 		get => _name;
 		set => ObserveSet(ref _name, value, "name");
@@ -45,19 +45,19 @@ public class Part : CObj
 	
 	protected virtual string[] Properties => ["name", "enabled"];
 	
-	public override CObj this[CObj key]
+	public override Obj this[Obj key]
 	{
 		get => key.TypeId != TypeId.String ? Nil.Value : (string)key switch
 		{
 			"id" => PartType.ToString(),
 			"name" => Name,
 			"enabled" => Enabled,
-			"parent" => (CObj)Parent ?? Nil.Value,
-			"children" => new ArrayView<Part>(_children),
+			"parent" => (Obj)Parent ?? Nil.Value,
+			"children" => new ArrayViewObj<Part>(_children),
 			"addChild" => GlobalFunction.Create(args => AddChild((Part)args[0]), TypeId.Part),
 			"removeChild" => GlobalFunction.Create(args => RemoveChild((Part)args[0]), TypeId.Part),
-			"findFirstChild" => GlobalFunction.Create(args => FindFirstChild((CStr)args[0]), TypeId.String),
-			_ => FindFirstChild((CStr)key),	
+			"findFirstChild" => GlobalFunction.Create(args => FindFirstChild((StrObj)args[0]), TypeId.String),
+			_ => FindFirstChild((StrObj)key),	
 		};
 		set
 		{
@@ -80,6 +80,7 @@ public class Part : CObj
 		PartType.Part => new Part(),
 		PartType.Part2d => new Part2d(),
 		PartType.Script => new Script(),
+		PartType.Camera2d => new Camera2d(),
 		_ => throw new InvalidEnumArgumentException(nameof(partType), (int)partType, typeof(PartType)),
 	};
 
@@ -136,7 +137,7 @@ public class Part : CObj
 		return true;
 	}
 
-	public CObj FindFirstChild(CStr name)
+	public Obj FindFirstChild(StrObj name)
 	{
 		foreach (var child in _children)
 		{
@@ -193,7 +194,7 @@ public class Part : CObj
 	}
 
 	protected bool ObserveSet<T>(ref T property, T value, string name)
-		where T : CObj
+		where T : Obj
 	{
 		if (EqualityComparer<T>.Default.Equals(property, value))
 		{
@@ -207,7 +208,7 @@ public class Part : CObj
 		return true;
 	}
 
-	private static Part New(CObj[] args)
+	private static Part New(Obj[] args)
 	{
 		var partStr = (string)args[0];
 
@@ -219,7 +220,7 @@ public class Part : CObj
 		return Create(partId);
 	}
 
-	private static Part Load(CObj[] args)
+	private static Part Load(Obj[] args)
 	{
 		var filepath = (string)args[0];
 		

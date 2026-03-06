@@ -189,7 +189,7 @@ public sealed class RpnParser
 
 		_stream.Consume(CsrId.GreaterThan);
 		
-		csrToken.Value = new CType(typeId);
+		csrToken.Value = new TypeObj(typeId);
 		
 		LoadOperator(csrToken);
 	}

@@ -1,6 +1,6 @@
 ﻿namespace sNet.CScriptPro;
 
-public sealed class FunctionDefinition : CObj
+public sealed class FunctionDefinition : Obj
 {
 	public FunctionDefinition() : base(TypeId.Nil) { }
 

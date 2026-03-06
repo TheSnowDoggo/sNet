@@ -12,6 +12,10 @@ public abstract class PartRoot
 
 	public readonly Part Root;
 
+	public virtual void Update(double delta)
+	{
+	}
+
 	public virtual void PartAdded(Part root)
 	{
 	}
@@ -20,7 +24,7 @@ public abstract class PartRoot
 	{
 	}
 
-	public virtual void PropertyUpdate(Part part, string name, CObj value)
+	public virtual void PropertyUpdate(Part part, string name, Obj value)
 	{
 	}
 }

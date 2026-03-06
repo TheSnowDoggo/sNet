@@ -20,13 +20,13 @@ public abstract class Tokenizer<Id, TokenType>
 
 	protected virtual IReadOnlySet<Id> CompoundSet => null;
 	
-	protected virtual IReadOnlyDictionary<string, CObj> LiteralMap => null;
+	protected virtual IReadOnlyDictionary<string, Obj> LiteralMap => null;
 	protected virtual IReadOnlyDictionary<string, Id> KeywordsMap => null;
 
 	protected virtual Id IdentifierId => default;
 	protected virtual Id LiteralId => default;
 
-	protected abstract TokenType Create(int line, Id id, string lexeme, CObj value = null);
+	protected abstract TokenType Create(int line, Id id, string lexeme, Obj value = null);
 
 	public List<TokenType> Tokenize()
 	{
@@ -184,7 +184,7 @@ public abstract class Tokenizer<Id, TokenType>
 
 		var str = sb.ToString();
 
-		if (LiteralMap != null && LiteralMap.TryGetValue(str, out CObj value))
+		if (LiteralMap != null && LiteralMap.TryGetValue(str, out Obj value))
 		{
 			return Create(_line, LiteralId, str, value);
 		}
@@ -227,7 +227,7 @@ public abstract class Tokenizer<Id, TokenType>
 		var str = sb.ToString();
 		var lexeme = $"{delim}{str}{delim}";
 
-		return Create(_line, LiteralId, lexeme, (CStr)str);
+		return Create(_line, LiteralId, lexeme, (StrObj)str);
 	}
 
 	private TokenType NextNumber()

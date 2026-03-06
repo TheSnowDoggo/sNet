@@ -6,7 +6,7 @@ public sealed class UserFunction : Function
 	public string[] Args { get; init; }
 	public List<Statement> Statements { get; init; }
 	
-	protected override CObj Invoke(CObj[] args)
+	protected override Obj Invoke(Obj[] args)
 	{
 		var context = new Context(Parent);
 		context.CreateScope();

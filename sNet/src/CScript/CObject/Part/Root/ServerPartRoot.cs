@@ -1,27 +1,52 @@
-﻿namespace sNet.CScriptPro;
+﻿using sNet.Service.Part;
+
+namespace sNet.CScriptPro;
 
 public sealed class ServerPartRoot : PartRoot
 {
 	private readonly UidRegistry<Part> _registry = [];
-	
+
+	public ServerPartService Service { get; set; }
+
+	public AddNetPack AddNetPack { get; } = new AddNetPack();
+	public RemoveNetPack RemoveNetPack { get; } = new RemoveNetPack();
 	public UpdateNetPack UpdateNetPack { get; } = new UpdateNetPack();
-	
+
+	public override void Update(double delta)
+	{
+		if (Service == null)
+		{
+			return;
+		}
+
+		Service.FireBroadcast(PartSid.Remove, RemoveNetPack, ServerPartService.MaxRemoveSize);
+		Service.FireBroadcast(PartSid.Add, AddNetPack, ServerPartService.MaxAddSize);
+		Service.FireBroadcast(PartSid.Update, UpdateNetPack, ServerPartService.MaxUpdateSize);
+	}
+
 	public override void PartAdded(Part root)
 	{
 		foreach (var part in root.Descendants())
 		{
 			if (part.Root != null)
 			{
-				throw new InvalidOperationException($"Cannot add part {part}: Root was not null.");
+				Logger.Error($"Cannot add part {part}: Root was not null.");
+				continue;
 			}
 			
 			if (part.Uid != Uid.Null)
 			{
-				throw new InvalidOperationException($"Cannot add part {part}: Uid (\'{part.Uid}\') was not null.");
+				Logger.Error($"Cannot add part {part}: Uid (\'{part.Uid}\') was not null.");
+				continue;
 			}
 
 			part.Uid = _registry.AddNew(part);
 			part.Root = this;
+		}
+		
+		if (Service != null)
+		{
+			AddNetPack.Enqueue(root);
 		}
 	}
 
@@ -31,17 +56,25 @@ public sealed class ServerPartRoot : PartRoot
 		{
 			if (part.Root != this)
 			{
-				throw new InvalidOperationException($"Cannot remove part {part}: Root was either null or not part of this root.");
+				Logger.Error($"Cannot remove part {part}: Root was either null or not part of this root.");
+				continue;
 			}
 			
 			if (part.Uid == Uid.Null)
 			{
-				throw new InvalidOperationException($"Failed to remove part {part}: Uid was null.");
+				Logger.Error($"Failed to remove part {part}: Uid was null.");
+				continue;
 			}
 
 			if (!_registry.Remove(part.Uid))
 			{
-				throw new InvalidOperationException($"Failed to remove part {part}: Uid (\'{part.Uid}\') was not found.");
+				Logger.Error($"Failed to remove part {part}: Uid (\'{part.Uid}\') was not found.");
+				continue;
+			}
+			
+			if (Service != null)
+			{
+				RemoveNetPack.Enqueue(part.Uid);
 			}
 			
 			part.Uid = Uid.Null;
@@ -49,13 +82,17 @@ public sealed class ServerPartRoot : PartRoot
 		}
 	}
 
-	public override void PropertyUpdate(Part part, string name, CObj value)
+	public override void PropertyUpdate(Part part, string name, Obj value)
 	{
 		if (!_registry.ContainsKey(part.Uid))
 		{
-			throw new InvalidOperationException($"Cannot queue property update for {part}: ServerUid was not found.");
+			Logger.Error($"Cannot queue property update for {part}: ServerUid was not found.");
+			return;
 		}
-		
-		UpdateNetPack.Enqueue(part.Uid, name, value);
+
+		if (Service != null)
+		{
+			UpdateNetPack.Enqueue(part.Uid, name, value);
+		}
 	}
 }

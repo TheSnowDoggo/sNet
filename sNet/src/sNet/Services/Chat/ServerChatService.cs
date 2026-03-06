@@ -1,6 +1,6 @@
 ﻿using sNet.Server;
 
-namespace sNet.Services.Chat;
+namespace sNet.Service.Chat;
 
 public sealed class ServerChatService : ServerService
 {
@@ -8,15 +8,15 @@ public sealed class ServerChatService : ServerService
 
 	public override void Receive(ServerNetCall call)
 	{
-		var chatId = (ChatSid)call.Stream.ReadExactByte();
+		var sid = (ChatSid)call.Stream.ReadExactByte();
 
-		switch (chatId)
+		switch (sid)
 		{
 		case ChatSid.Chat:
 			HandleChat(call);
 			break;
 		default:
-			Logger.Error($"Unrecognised chat id {chatId}.");
+			Logger.Error($"Unrecognised chat sid: {sid}");
 			break;
 		}
 	}
@@ -61,12 +61,19 @@ public sealed class ServerChatService : ServerService
 
 	private void HandleChat(ServerNetCall call)
 	{
-		string content = call.Stream.ReadNetUtf8();
+		try
+		{
+			string content = call.Stream.ReadNetUtf8();
 
-		string message = $"<{call.Client.Idx}> {content}";
+			string message = $"<{call.Client.Idx}> {content}";
 		
-		Logger.Info(message);
+			Logger.Info(message);
 
-		Task.Run(() => BroadcastMessageAsync(message, call.Client.Idx));
+			Task.Run(() => BroadcastMessageAsync(message, call.Client.Idx));
+		}
+		catch (Exception ex)
+		{
+			Logger.Error(ex.Message);
+		}
 	}
 }

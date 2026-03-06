@@ -55,7 +55,7 @@ public sealed class CsrTokenizer : Tokenizer<CsrId, CsrToken>
 		CsrId.Or,
 	}.ToFrozenSet();
 	
-	private static readonly FrozenDictionary<string, CObj> Literals = new Dictionary<string, CObj>()
+	private static readonly FrozenDictionary<string, Obj> Literals = new Dictionary<string, Obj>()
 	{
 		{ "nil", Nil.Value },
 		{ "true", Bool.True },
@@ -96,13 +96,13 @@ public sealed class CsrTokenizer : Tokenizer<CsrId, CsrToken>
 
 	protected override IReadOnlySet<CsrId> CompoundSet => Compound;
 
-	protected override IReadOnlyDictionary<string, CObj> LiteralMap => Literals;
+	protected override IReadOnlyDictionary<string, Obj> LiteralMap => Literals;
 	protected override IReadOnlyDictionary<string, CsrId> KeywordsMap => Keywordses;
 
 	protected override CsrId LiteralId => CsrId.Literal;
 	protected override CsrId IdentifierId => CsrId.Identifier;
 
-	protected override CsrToken Create(int line, CsrId id, string lexeme, CObj value = null)
+	protected override CsrToken Create(int line, CsrId id, string lexeme, Obj value = null)
 	{
 		return new CsrToken(line, id, lexeme, value ?? Nil.Value);
 	}

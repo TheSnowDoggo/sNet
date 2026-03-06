@@ -2,7 +2,7 @@
 
 public sealed class CsrToken : Token<CsrId>
 {
-	public CsrToken(int line, CsrId type, string lexeme, CObj value)
+	public CsrToken(int line, CsrId type, string lexeme, Obj value)
 		: base(line, type, lexeme, value) { }
 	
 	public bool IsCompound()

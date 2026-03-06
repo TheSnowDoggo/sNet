@@ -87,12 +87,12 @@ public class NetSerializer : IDisposable
 		WrittenBytes += _stream.WriteNetUtf16(value);
 	}
 	
-	public void WriteCObj(CObj obj)
+	public void WriteCObj(Obj obj)
 	{
 		WrittenBytes += _stream.WriteCObj(obj);
 	}
 
-	public void WriteArray(UserArray value)
+	public void WriteArray(ArrayObj value)
 	{
 		WrittenBytes += _stream.WriteArray(value);
 	}

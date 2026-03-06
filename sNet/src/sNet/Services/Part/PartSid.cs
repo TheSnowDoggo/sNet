@@ -1,4 +1,4 @@
-namespace sNet.Services.Part;
+namespace sNet.Service.Part;
 
 public enum PartSid : byte
 {

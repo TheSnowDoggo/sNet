@@ -1,7 +1,7 @@
 ﻿using sNet.CScriptPro;
 using sNet.Client;
 using sNet.Server;
-using sNet.Services.Chat;
+using sNet.Service.Chat;
 
 namespace sNet;
 
@@ -27,6 +27,8 @@ internal static class Program
 		}
 
 		Console.WriteLine(value);
+
+		Console.Read();
 		
 		return;
 		

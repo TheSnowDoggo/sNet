@@ -3,7 +3,7 @@
 public abstract class Token<T>
 	where T : struct
 {
-	protected Token(int line, T type, string lexeme, CObj value)
+	protected Token(int line, T type, string lexeme, Obj value)
 	{
 		Line = line;
 		Type = type;
@@ -14,7 +14,7 @@ public abstract class Token<T>
 	public int Line { get; }
 	public T Type { get; set; }
 	public string Lexeme { get; set; }
-	public CObj Value { get; set; }
+	public Obj Value { get; set; }
 
 	public override string ToString()
 	{

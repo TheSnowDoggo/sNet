@@ -2,9 +2,9 @@
 
 public class Part2d : Part
 {
-	private CVec2 _position = Vec2.Zero;
+	private Vec2Obj _position = Vec2.Zero;
 
-	public CVec2 Position
+	public Vec2Obj Position
 	{
 		get => _position;
 		set
@@ -16,9 +16,9 @@ public class Part2d : Part
 		}
 	}
 	
-	private CVec2 _globalPosition = Vec2.Zero;
+	private Vec2Obj _globalPosition = Vec2.Zero;
 	
-	public CVec2 GlobalPosition
+	public Vec2Obj GlobalPosition
 	{
 		get => _globalPosition;
 		set => Position = value - _globalPosition;
@@ -28,7 +28,7 @@ public class Part2d : Part
 
 	protected override string[] Properties => [..base.Properties, "position", "globalPosition"];
 
-	public override CObj this[CObj key]
+	public override Obj this[Obj key]
 	{
 		get => key.TypeId != TypeId.String ? Nil.Value : (string)key switch
 		{
@@ -43,10 +43,10 @@ public class Part2d : Part
 			switch ((string)key)
 			{
 			case "position":
-				Position = (CVec2)value.Expect(TypeId.Vec2);
+				Position = (Vec2Obj)value.Expect(TypeId.Vec2);
 				break;
 			case "globalPosition":
-				GlobalPosition = (CVec2)value.Expect(TypeId.Vec2);
+				GlobalPosition = (Vec2Obj)value.Expect(TypeId.Vec2);
 				break;
 			default:
 				base[key] = value;

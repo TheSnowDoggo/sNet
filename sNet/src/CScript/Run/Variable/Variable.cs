@@ -2,12 +2,12 @@ namespace sNet.CScriptPro;
 
 public sealed class Variable
 {
-    public Variable(CObj value, VariableAttribute attributes = VariableAttribute.None)
+    public Variable(Obj value, VariableAttribute attributes = VariableAttribute.None)
     {
         Value = value;
         Attributes = attributes;
     }
     
-    public CObj Value { get; set; }
+    public Obj Value { get; set; }
     public VariableAttribute Attributes { get; }
 }

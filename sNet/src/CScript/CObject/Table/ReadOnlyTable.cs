@@ -4,12 +4,12 @@ using System.Text;
 
 namespace sNet.CScriptPro;
 
-public class ReadOnlyTable : CObj,
-	IReadOnlyDictionary<CObj, CObj>
+public class ReadOnlyTable : Obj,
+	IReadOnlyDictionary<Obj, Obj>
 {
-	private readonly IReadOnlyDictionary<CObj, CObj> _dictionary;
+	private readonly IReadOnlyDictionary<Obj, Obj> _dictionary;
 	
-	public ReadOnlyTable(IReadOnlyDictionary<CObj, CObj> dictionary)
+	public ReadOnlyTable(IReadOnlyDictionary<Obj, Obj> dictionary)
 		: base(TypeId.Table)
 	{
 		_dictionary = dictionary;
@@ -17,25 +17,25 @@ public class ReadOnlyTable : CObj,
 	
 	public int Count => _dictionary.Count;
 
-	public IEnumerable<CObj> Keys => _dictionary.Keys;
-	public IEnumerable<CObj> Values => _dictionary.Values;
+	public IEnumerable<Obj> Keys => _dictionary.Keys;
+	public IEnumerable<Obj> Values => _dictionary.Values;
 
-	public override CObj this[CObj key] => _dictionary.GetValueOrDefault(key, Nil.Value);
+	public override Obj this[Obj key] => _dictionary.GetValueOrDefault(key, Nil.Value);
 	
-	public static implicit operator ReadOnlyTable(FrozenDictionary<CObj, CObj> dictionary)
+	public static implicit operator ReadOnlyTable(FrozenDictionary<Obj, Obj> dictionary)
 		=> new ReadOnlyTable(dictionary);
 
-	public bool ContainsKey(CObj key)
+	public bool ContainsKey(Obj key)
 	{
 		return _dictionary.ContainsKey(key);
 	}
 
-	public bool TryGetValue(CObj key, out CObj value)
+	public bool TryGetValue(Obj key, out Obj value)
 	{
 		return _dictionary.TryGetValue(key, out value);
 	}
 
-	public IEnumerator<KeyValuePair<CObj, CObj>> GetEnumerator()
+	public IEnumerator<KeyValuePair<Obj, Obj>> GetEnumerator()
 	{
 		return _dictionary.GetEnumerator();
 	}

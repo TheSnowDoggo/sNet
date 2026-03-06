@@ -5,4 +5,5 @@ public enum PartType
 	Part,
 	Part2d,
 	Script,
+	Camera2d,
 }

@@ -10,17 +10,17 @@ public sealed class Evaluator
         { CsrId.Mul, new Dictionary<TypeSet, Binary>
         {
             { (TypeId.Number, TypeId.Number), (x, y) => (Number)x * (Number)y },
-            { (TypeId.Vec2, TypeId.Vec2), (x, y) => (CVec2)x * (CVec2)y },
-            { (TypeId.Vec2, TypeId.Number), (x, y) => (CVec2)x * (Number)y },
-            { (TypeId.Number, TypeId.Vec2), (x, y) => (CVec2)y * (Number)x },
+            { (TypeId.Vec2, TypeId.Vec2), (x, y) => (Vec2Obj)x * (Vec2Obj)y },
+            { (TypeId.Vec2, TypeId.Number), (x, y) => (Vec2Obj)x * (Number)y },
+            { (TypeId.Number, TypeId.Vec2), (x, y) => (Vec2Obj)y * (Number)x },
         }.ToFrozenDictionary() },
         
         { CsrId.Div, new Dictionary<TypeSet, Binary>
         {
             { (TypeId.Number, TypeId.Number), (x, y) => (Number)x / (Number)y },
-            { (TypeId.Vec2, TypeId.Vec2), (x, y) => (CVec2)x / (CVec2)y },
-            { (TypeId.Vec2, TypeId.Number), (x, y) => (CVec2)x / (Number)y },
-            { (TypeId.Number, TypeId.Vec2), (x, y) => (CVec2)y / (Number)x },
+            { (TypeId.Vec2, TypeId.Vec2), (x, y) => (Vec2Obj)x / (Vec2Obj)y },
+            { (TypeId.Vec2, TypeId.Number), (x, y) => (Vec2Obj)x / (Number)y },
+            { (TypeId.Number, TypeId.Vec2), (x, y) => (Vec2Obj)y / (Number)x },
         }.ToFrozenDictionary() },
         
         { CsrId.Rem, new Dictionary<TypeSet, Binary>
@@ -30,15 +30,15 @@ public sealed class Evaluator
         
         { CsrId.Add, new Dictionary<TypeSet, Binary>
         {
-            { (TypeId.String, TypeId.String), (x, y) => (CStr)x + (CStr)y },
+            { (TypeId.String, TypeId.String), (x, y) => (StrObj)x + (StrObj)y },
             { (TypeId.Number, TypeId.Number), (x, y) => (Number)x + (Number)y },
-            { (TypeId.Vec2, TypeId.Vec2), (x, y) => (CVec2)x + (CVec2)y },
+            { (TypeId.Vec2, TypeId.Vec2), (x, y) => (Vec2Obj)x + (Vec2Obj)y },
         }.ToFrozenDictionary() },
         
         { CsrId.Sub, new Dictionary<TypeSet, Binary>
         {
             { (TypeId.Number, TypeId.Number), (x, y) => (Number)x - (Number)y },
-            { (TypeId.Vec2, TypeId.Vec2), (x, y) => (CVec2)x - (CVec2)y },
+            { (TypeId.Vec2, TypeId.Vec2), (x, y) => (Vec2Obj)x - (Vec2Obj)y },
         }.ToFrozenDictionary() },
         
         { CsrId.ShiftLeft, new Dictionary<TypeSet, Binary>
@@ -53,25 +53,25 @@ public sealed class Evaluator
 
         { CsrId.LessThan, new Dictionary<TypeSet, Binary>
         {
-            { (TypeId.String, TypeId.String), (x, y) => (CStr)x < (CStr)y },
+            { (TypeId.String, TypeId.String), (x, y) => (StrObj)x < (StrObj)y },
             { (TypeId.Number, TypeId.Number), (x, y) => (Number)x < (Number)y },
         }.ToFrozenDictionary() },
         
         { CsrId.GreaterThan, new Dictionary<TypeSet, Binary>
         {
-            { (TypeId.String, TypeId.String), (x, y) => (CStr)x > (CStr)y },
+            { (TypeId.String, TypeId.String), (x, y) => (StrObj)x > (StrObj)y },
             { (TypeId.Number, TypeId.Number), (x, y) => (Number)x > (Number)y },
         }.ToFrozenDictionary() },
         
         { CsrId.LessThanOrEqual, new Dictionary<TypeSet, Binary>
         {
-            { (TypeId.String, TypeId.String), (x, y) => (CStr)x <= (CStr)y },
+            { (TypeId.String, TypeId.String), (x, y) => (StrObj)x <= (StrObj)y },
             { (TypeId.Number, TypeId.Number), (x, y) => (Number)x <= (Number)y },
         }.ToFrozenDictionary() },
         
         { CsrId.GreaterThanOrEqual, new Dictionary<TypeSet, Binary>
         {
-            { (TypeId.String, TypeId.String), (x, y) => (CStr)x >= (CStr)y },
+            { (TypeId.String, TypeId.String), (x, y) => (StrObj)x >= (StrObj)y },
             { (TypeId.Number, TypeId.Number), (x, y) => (Number)x >= (Number)y },
         }.ToFrozenDictionary() },
 
@@ -96,7 +96,7 @@ public sealed class Evaluator
     
     private readonly Context _context;
     private readonly List<CsrToken> _tokens;
-    private Stack<CObj> _stack;
+    private Stack<Obj> _stack;
 
     public Evaluator(Context context, List<CsrToken> tokens)
     {
@@ -104,7 +104,7 @@ public sealed class Evaluator
         _tokens = tokens;
     }
 
-    public CObj Evaluate()
+    public Obj Evaluate()
     {
         _stack = [];
         
@@ -127,7 +127,7 @@ public sealed class Evaluator
         }
 
         var value = stack.Pop();
-        CObj.Deref(ref value);
+        Obj.Deref(ref value);
         return value;
     }
 
@@ -139,7 +139,7 @@ public sealed class Evaluator
             _stack.Push(csrToken.Value.Clone());
             break;
         case CsrId.Identifier:
-            _stack.Push(new VariableRef(csrToken.Lexeme, _context));
+            _stack.Push(new VariableRefObj(csrToken.Lexeme, _context));
             break;
         case CsrId.Equals:
             EvalEquals();
@@ -196,7 +196,7 @@ public sealed class Evaluator
         }
     }
 
-    private void PopUnary(out CObj value)
+    private void PopUnary(out Obj value)
     {
         if (!_stack.TryPop(out value))
         {
@@ -204,13 +204,13 @@ public sealed class Evaluator
         }
     }
     
-    private void PopUnaryDeref(out CObj value)
+    private void PopUnaryDeref(out Obj value)
     {
         PopUnary(out value);
-        CObj.Deref(ref value);
+        Obj.Deref(ref value);
     }
 
-    private void PopBinary(out CObj left, out CObj right)
+    private void PopBinary(out Obj left, out Obj right)
     {
         if (_stack.Count < 2)
         {
@@ -221,11 +221,11 @@ public sealed class Evaluator
         left = _stack.Pop();
     }
     
-    private void PopBinaryDeref(out CObj left, out CObj right)
+    private void PopBinaryDeref(out Obj left, out Obj right)
     {
         PopBinary(out left, out right);
-        CObj.Deref(ref left);
-        CObj.Deref(ref right);
+        Obj.Deref(ref left);
+        Obj.Deref(ref right);
     }
     
     private void EvalEquals()
@@ -245,9 +245,9 @@ public sealed class Evaluator
     private void EvalAssign()
     {
         PopBinary(out var left, out var right);
-        CObj.Deref(ref right);
+        Obj.Deref(ref right);
         
-        if (left is not CRef cref)
+        if (left is not RefObj cref)
         {
             throw new InterpreterException(_context.Line, $"Cannot assign to non-reference type {left.TypeId}.");
         }
@@ -285,12 +285,12 @@ public sealed class Evaluator
             throw new InterpreterException(_stack.Count, $"Function expected {argCount} args, stack only contained {_stack.Count}.");
         }
         
-        var args = new CObj[argCount];
+        var args = new Obj[argCount];
         
         for (int i = args.Length - 1; i >= 0; i--)
         {
             args[i] = _stack.Pop();
-            CObj.Deref(ref args[i]);
+            Obj.Deref(ref args[i]);
         }
         
         PopUnaryDeref(out var function);
@@ -327,25 +327,25 @@ public sealed class Evaluator
     private void EvalMemberRef(CsrToken csrToken)
     {
         PopBinary(out var left, out var right);
-        CObj.Deref(ref left);
+        Obj.Deref(ref left);
         
-        if (!ReferenceEquals(csrToken.Value, Bool.True) && right is VariableRef vref)
+        if (!ReferenceEquals(csrToken.Value, Bool.True) && right is VariableRefObj vref)
         {
-            right = (CStr)vref.Name;
+            right = (StrObj)vref.Name;
         }
         else
         {
-            CObj.Deref(ref right);
+            Obj.Deref(ref right);
         }
         
-        _stack.Push(new MemberRef(left, right));
+        _stack.Push(new MemberRefObj(left, right));
     }
 
     private void EvalCast(CsrToken csrToken)
     {
         PopUnaryDeref(out var x);
         
-        var cType = (CType)csrToken.Value;
+        var cType = (TypeObj)csrToken.Value;
         
         _stack.Push(x.Cast(cType.Id));
     }
@@ -361,7 +361,7 @@ public sealed class Evaluator
         PopBinaryDeref(out var left, out var right);
         ThrowIfNot(right, TypeId.String);
 
-        if (!Enum.TryParse<TypeId>((string)(CStr)right, true, out var type))
+        if (!Enum.TryParse<TypeId>((string)(StrObj)right, true, out var type))
         {
             throw new InterpreterException(_context.Line, $"Unrecognised cast type {right}.");
         }
@@ -394,9 +394,9 @@ public sealed class Evaluator
         }
         
         PopBinary(out var left, out var right);
-        CObj.Deref(ref right);
+        Obj.Deref(ref right);
 
-        if (left is not CRef cref)
+        if (left is not RefObj cref)
         {
             throw new InterpreterException(_context.Line, $"Cannot assign to non-reference type {left.TypeId}.");
         }
@@ -411,7 +411,7 @@ public sealed class Evaluator
         _stack.Push(cref.Value = operation.Invoke(left, right));
     }
 
-    private void ThrowIfNot(CObj obj, TypeId expectedTypeId, [CallerMemberName] string memberName = "")
+    private void ThrowIfNot(Obj obj, TypeId expectedTypeId, [CallerMemberName] string memberName = "")
     {
         if (obj.TypeId != expectedTypeId)
         {

@@ -2,20 +2,20 @@
 
 public sealed class UserTable : ReadOnlyTable
 {
-	private readonly Dictionary<CObj, CObj> _values;
+	private readonly Dictionary<Obj, Obj> _values;
 
 	public UserTable()
 		: this([])
 	{
 	}
 	
-	public UserTable(Dictionary<CObj, CObj> values)
+	public UserTable(Dictionary<Obj, Obj> values)
 		: base(values)
 	{
 		_values = values;
 	}
 
-	public override CObj this[CObj key]
+	public override Obj this[Obj key]
 	{
 		set
 		{

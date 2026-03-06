@@ -1,24 +1,24 @@
 ﻿using sNet.Client;
 
-namespace sNet.Services.Chat;
+namespace sNet.Service.Chat;
 
 public sealed class ClientChatService : ClientService
 {
-	public ClientChatService() : base(ServiceId.Chat) { }
-
 	public event Action<string> ChatReceived;
-	
+
+	public override ServiceId ServiceId => ServiceId.Chat;
+
 	public override void Receive(NetCall call)
 	{
-		var chatId = (ChatSid)call.Stream.ReadExactByte();
+		var sid = (ChatSid)call.Stream.ReadExactByte();
 
-		switch (chatId)
+		switch (sid)
 		{
 		case ChatSid.Chat:
 			HandleChat(call);
 			break;
 		default:
-			Logger.Error($"Unrecognised chat id: {chatId}.");
+			Logger.Error($"Unrecognised chat sid: {sid}");
 			break;
 		}
 	}
@@ -44,10 +44,17 @@ public sealed class ClientChatService : ClientService
 
 	private void HandleChat(NetCall call)
 	{
-		string message = call.Stream.ReadNetUtf8();
-		
-		Logger.Info(message);
-		
-		ChatReceived?.Invoke(message);
+		try
+		{
+			string message = call.Stream.ReadNetUtf8();
+
+			Logger.Info(message);
+
+			ChatReceived?.Invoke(message);
+		}
+		catch (Exception ex)
+		{
+			Logger.Error(ex.Message);
+		}
 	}
 }
