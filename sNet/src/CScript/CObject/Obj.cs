@@ -20,12 +20,12 @@ public abstract class Obj
 	public static implicit operator Obj(double value) => (Number)value;
 	public static implicit operator Obj(string value) => (StrObj)value;
 	public static implicit operator Obj(bool value) => (Bool)value;
-	public static implicit operator Obj(Vec2 value) => (Vec2Obj)value;
+	public static implicit operator Obj(Vector2 value) => (Vec2Obj)value;
 	
 	public static explicit operator double(Obj value) => (Number)value;
 	public static explicit operator string(Obj value) => (StrObj)value;
 	public static explicit operator bool(Obj value) => (Bool)value;
-	public static explicit operator Vec2(Obj value) => (Vec2Obj)value;
+	public static explicit operator Vector2(Obj value) => (Vec2Obj)value;
 
 	public static void Deref(ref Obj obj)
 	{

@@ -36,6 +36,14 @@ public class Part : Obj
 		get => _enabled;
 		set => ObserveSet(ref _enabled, value, "enabled");
 	}
+
+	private Bool _visible = true;
+
+	public Bool Visible
+	{
+		get => _visible;
+		set => ObserveSet(ref _visible, value, "visible");
+	}
 	
 	public Uid Uid { get; set; }
 	
@@ -52,6 +60,7 @@ public class Part : Obj
 			"id" => PartType.ToString(),
 			"name" => Name,
 			"enabled" => Enabled,
+			"visible" => Visible,
 			"parent" => (Obj)Parent ?? Nil.Value,
 			"children" => new ArrayViewObj<Part>(_children),
 			"addChild" => GlobalFunction.Create(args => AddChild((Part)args[0]), TypeId.Part),
@@ -66,10 +75,13 @@ public class Part : Obj
 			switch ((string)key)
 			{
 			case "name":
-				Name = (string)value.Expect(TypeId.String);
+				Name = value.Expect<StrObj>(TypeId.String);
 				break;
 			case "enabled":
-				Enabled = (bool)value.Expect(TypeId.Bool);
+				Enabled = value.Expect<Bool>(TypeId.Bool);
+				break;
+			case "visible":
+				Visible = value.Expect<Bool>(TypeId.Bool);
 				break;
 			}
 		}
@@ -81,6 +93,7 @@ public class Part : Obj
 		PartType.Part2d => new Part2d(),
 		PartType.Script => new Script(),
 		PartType.Camera2d => new Camera2d(),
+		PartType.Sprite2d => new Sprite2d(),
 		_ => throw new InvalidEnumArgumentException(nameof(partType), (int)partType, typeof(PartType)),
 	};
 

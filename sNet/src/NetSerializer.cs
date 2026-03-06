@@ -102,7 +102,7 @@ public class NetSerializer : IDisposable
 		WrittenBytes += _stream.WriteTable(value);
 	}
 
-	public void WriteVec2(Vec2 value)
+	public void WriteVec2(Vector2 value)
 	{
 		WrittenBytes += _stream.WriteVec2(value);
 	}

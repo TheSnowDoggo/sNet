@@ -18,4 +18,10 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="SCENeo">
+        <HintPath>..\..\..\source\repos\SCENeo\bin\Debug\net9.0\SCENeo.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

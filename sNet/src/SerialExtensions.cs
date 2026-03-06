@@ -186,9 +186,9 @@ public static class SerialExtensions
 		return written;
 	}
 
-	public static int WriteVec2(this Stream stream, Vec2 vec2)
+	public static int WriteVec2(this Stream stream, Vector2 vector2)
 	{
-		return stream.WriteNetDouble(vec2.X) + stream.WriteNetDouble(vec2.Y);
+		return stream.WriteNetDouble(vector2.X) + stream.WriteNetDouble(vector2.Y);
 	}
 
 	public static int WritePart(this Stream stream, Part part)

@@ -2,7 +2,7 @@
 
 public class Part2d : Part
 {
-	private Vec2Obj _position = Vec2.Zero;
+	private Vec2Obj _position = Vector2.Zero;
 
 	public Vec2Obj Position
 	{
@@ -16,7 +16,7 @@ public class Part2d : Part
 		}
 	}
 	
-	private Vec2Obj _globalPosition = Vec2.Zero;
+	private Vec2Obj _globalPosition = Vector2.Zero;
 	
 	public Vec2Obj GlobalPosition
 	{

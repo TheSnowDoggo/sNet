@@ -1,22 +1,33 @@
-﻿namespace sNet.CScriptPro;
+﻿using SCENeo;
+
+namespace sNet.CScriptPro;
 
 public abstract class Render2d : Part2d
 {
-	private Number _channel;
+	private Number _layer;
 	
-	public Number Channel
+	public Number Layer
 	{
-		get => _channel;
-		set => ObserveSet(ref _channel, value, "channel");
+		get => _layer;
+		set => ObserveSet(ref _layer, value, "layer");
 	}
 
-	protected override string[] Properties => [..base.Properties, "channel"];
+	private StrObj _anchor;
+
+	public StrObj Anchor
+	{
+		get => _anchor;
+		set => ObserveSet(ref _anchor, value, "anchor");
+	}
+	
+	protected override string[] Properties => [..base.Properties, "layer"];
 
 	public override Obj this[Obj key]
 	{
 		get => key.TypeId != TypeId.String ? Nil.Value : (string)key switch
 		{
-			"channel" => Channel,
+			"layer" => Layer,
+			"anchor" => Anchor,
 			_ => base[key],
 		};
 		set
@@ -26,7 +37,10 @@ public abstract class Render2d : Part2d
 			switch ((string)key)
 			{
 			case "channel":
-				Channel = (Number)value.Expect(TypeId.Number);
+				Layer = value.Expect<Number>(TypeId.Number);
+				break;
+			case "anchor":
+				Anchor = value.Expect<StrObj>(TypeId.String);
 				break;
 			default:
 				base[key] = value;
@@ -35,13 +49,16 @@ public abstract class Render2d : Part2d
 		}
 	}
 
+	public abstract IRenderable Render();
+
 	public override int Serialize(Stream stream)
 	{
-		return base.Serialize(stream) + stream.WriteNetDouble(Channel);
+		return base.Serialize(stream) + stream.WriteNetDouble(Layer) + stream.WriteNetUtf8(Anchor);
 	}
 
 	public override void Deserialize(Stream stream)
 	{
-		Channel = stream.ReadNetInt64();
+		Layer = stream.ReadNetDouble();
+		Anchor = stream.ReadNetUtf8();
 	}
 }

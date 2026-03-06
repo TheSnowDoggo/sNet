@@ -5,44 +5,44 @@ namespace sNet.CScriptPro;
 public sealed class Vec2Obj : Obj,
     IEquatable<Vec2Obj>
 {
-    private readonly Vec2 _value;
+    private readonly Vector2 _value;
 
     public static readonly ReadOnlyTable Export = new Dictionary<Obj, Obj>()
     {
         { "new", GlobalFunction.Create(New, TypeId.Number, TypeId.Number) },
-        { "ZERO", new Vec2Obj(Vec2.Zero) },
-        { "ONE", new Vec2Obj(Vec2.One) },
-        { "UP", new Vec2Obj(Vec2.Up) },
-        { "DOWN", new Vec2Obj(Vec2.Down) },
-        { "LEFT", new Vec2Obj(Vec2.Left) },
-        { "RIGHT", new Vec2Obj(Vec2.Right) },
+        { "ZERO", new Vec2Obj(Vector2.Zero) },
+        { "ONE", new Vec2Obj(Vector2.One) },
+        { "UP", new Vec2Obj(Vector2.Up) },
+        { "DOWN", new Vec2Obj(Vector2.Down) },
+        { "LEFT", new Vec2Obj(Vector2.Left) },
+        { "RIGHT", new Vec2Obj(Vector2.Right) },
     }.ToFrozenDictionary();
     
-    public Vec2Obj(Vec2 value)
+    public Vec2Obj(Vector2 value)
         : base(TypeId.Vec2)
     {
         _value = value;
     }
     
     public Vec2Obj(Number x, Number y)
-        : this(new Vec2((double)x, (double)y))
+        : this(new Vector2((double)x, (double)y))
     {
     }
 
-    public static implicit operator Vec2Obj(Vec2 v) => new Vec2Obj(v);
-    public static implicit operator Vec2(Vec2Obj v) => v._value;
+    public static implicit operator Vec2Obj(Vector2 v) => new Vec2Obj(v);
+    public static implicit operator Vector2(Vec2Obj v) => v._value;
     
     public static bool operator ==(Vec2Obj a, Vec2Obj b) => Equals(a, b);
     public static bool operator !=(Vec2Obj a, Vec2Obj b) => !Equals(a, b);
 
-    public static Vec2 operator *(Vec2Obj a, Vec2Obj b) => a._value * b._value;
-    public static Vec2 operator *(Vec2Obj v, Number x) => v._value * (double)x;
+    public static Vector2 operator *(Vec2Obj a, Vec2Obj b) => a._value * b._value;
+    public static Vector2 operator *(Vec2Obj v, Number x) => v._value * (double)x;
     
-    public static Vec2 operator /(Vec2Obj a, Vec2Obj b) => a._value / b._value;
-    public static Vec2 operator /(Vec2Obj v, Number x) => v._value / (double)x;
+    public static Vector2 operator /(Vec2Obj a, Vec2Obj b) => a._value / b._value;
+    public static Vector2 operator /(Vec2Obj v, Number x) => v._value / (double)x;
     
-    public static Vec2 operator +(Vec2Obj a, Vec2Obj b) => a._value + b._value;
-    public static Vec2 operator -(Vec2Obj a, Vec2Obj b) => a._value - b._value;
+    public static Vector2 operator +(Vec2Obj a, Vec2Obj b) => a._value + b._value;
+    public static Vector2 operator -(Vec2Obj a, Vec2Obj b) => a._value - b._value;
 
     public override Obj this[Obj key] => key.TypeId != TypeId.String ? Nil.Value : (string)key switch
     {
@@ -98,7 +98,7 @@ public sealed class Vec2Obj : Obj,
         return new Vec2Obj((Number)args[0].Cast(TypeId.Number), (Number)args[1].Cast(TypeId.Number));
     }
 
-    private static GlobalFunction CreateMember(Func<Vec2> func)
+    private static GlobalFunction CreateMember(Func<Vector2> func)
     {
         return GlobalFunction.Create(Func);
         
