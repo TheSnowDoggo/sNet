@@ -2,14 +2,9 @@
 
 public abstract class ServerService
 {
-	public ServerService(ServiceId serviceId)
-	{
-		ServiceId = serviceId;
-	}
-	
 	public NetServer Server { get; set; }
 	
-	public ServiceId ServiceId { get; }
+	public abstract ServiceId ServiceId { get; }
 
 	public virtual void Initialize()
 	{

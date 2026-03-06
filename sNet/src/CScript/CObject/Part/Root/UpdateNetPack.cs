@@ -1,15 +1,15 @@
 ﻿namespace sNet.CScriptPro;
 
-public sealed class PropertyQueue
+public sealed class UpdateNetPack
 {
 	private UidRegistry<Dictionary<string, CObj>> _data = [];
 	
-	public PropertyQueue() { }
-	public PropertyQueue(int capacity)
+	public UpdateNetPack() { }
+	public UpdateNetPack(int capacity)
 	{
 		_data = new UidRegistry<Dictionary<string, CObj>>(capacity);
 	}
-
+	
 	public UidRegistry<Dictionary<string, CObj>> Data => _data;
 
 	public void Enqueue(Uid uid, string name, CObj obj)
@@ -22,7 +22,7 @@ public sealed class PropertyQueue
 		updates[name] = obj;
 	}
 
-	public static PropertyQueue Deserialize(Stream stream)
+	public static UpdateNetPack Deserialize(Stream stream)
 	{
 		int queueCount = stream.ReadNetInt32();
 
@@ -31,7 +31,7 @@ public sealed class PropertyQueue
 			throw new InvalidDataException($"Queue count (\'{queueCount}\') was negative.");
 		}
 		
-		var queue = new PropertyQueue(queueCount);
+		var queue = new UpdateNetPack(queueCount);
 
 		for (int i = 0; i < queueCount; i++)
 		{
@@ -65,7 +65,7 @@ public sealed class PropertyQueue
 		return queue;
 	}
 
-	public void Serialize(CObjSerializer serial)
+	public void Serialize(NetSerializer serial)
 	{
 		var data = Interlocked.Exchange(ref _data, []);
 		

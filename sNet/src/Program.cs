@@ -15,7 +15,7 @@ internal static class Program
 
 		using var buffer = RentBuffer.Share(4096);
 
-		using (var serial = new CObjSerializer(buffer.Open()))
+		using (var serial = new NetSerializer(buffer.Open()))
 		{
 			serial.WriteCObj(value);
 			buffer.Trim(serial.WrittenBytes);

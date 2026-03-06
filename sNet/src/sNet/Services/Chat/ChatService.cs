@@ -14,7 +14,7 @@ public static class ChatService
 			serial.Begin();
 			
 			serial.WriteByte((byte)ServiceId.Chat);
-			serial.WriteByte((byte)ChatId.Chat);
+			serial.WriteByte((byte)ChatSid.Chat);
 			serial.WriteUtf8(message);
 			
 			serial.End();

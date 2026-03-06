@@ -10,11 +10,11 @@ public sealed class ClientChatService : ClientService
 	
 	public override void Receive(NetCall call)
 	{
-		var chatId = (ChatId)call.Stream.ReadExactByte();
+		var chatId = (ChatSid)call.Stream.ReadExactByte();
 
 		switch (chatId)
 		{
-		case ChatId.Chat:
+		case ChatSid.Chat:
 			HandleChat(call);
 			break;
 		default:

@@ -4,15 +4,15 @@ namespace sNet.Services.Chat;
 
 public sealed class ServerChatService : ServerService
 {
-	public ServerChatService() : base(ServiceId.Chat) { }
+	public override ServiceId ServiceId => ServiceId.Chat;
 
 	public override void Receive(ServerNetCall call)
 	{
-		var chatId = (ChatId)call.Stream.ReadExactByte();
+		var chatId = (ChatSid)call.Stream.ReadExactByte();
 
 		switch (chatId)
 		{
-		case ChatId.Chat:
+		case ChatSid.Chat:
 			HandleChat(call);
 			break;
 		default:

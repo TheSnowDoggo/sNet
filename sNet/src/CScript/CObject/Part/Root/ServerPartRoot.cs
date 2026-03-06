@@ -4,7 +4,7 @@ public sealed class ServerPartRoot : PartRoot
 {
 	private readonly UidRegistry<Part> _registry = [];
 	
-	public PropertyQueue PropertyQueue { get; } = new PropertyQueue();
+	public UpdateNetPack UpdateNetPack { get; } = new UpdateNetPack();
 	
 	public override void PartAdded(Part root)
 	{
@@ -56,6 +56,6 @@ public sealed class ServerPartRoot : PartRoot
 			throw new InvalidOperationException($"Cannot queue property update for {part}: ServerUid was not found.");
 		}
 		
-		PropertyQueue.Enqueue(part.Uid, name, value);
+		UpdateNetPack.Enqueue(part.Uid, name, value);
 	}
 }
