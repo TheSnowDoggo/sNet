@@ -6,7 +6,7 @@ const table = {
     },
     datapoints = [{ another = "hello" }, 234423, Vec2.new(34, 21)],
     long_msg = "this is a really long message to see the size go big",
-    part = [Part.load('C:/Users/redst/RiderProjects/CScriptPro/CScriptPro/script/base.part'), Part.new('part'), Part.new('script')],
+    part = [Part.load('scripts/base.part'), Part.new('part'), Part.new('script')],
 };
 
 table.part[2].name = 'alice';

@@ -1,5 +1,4 @@
-﻿using CScriptPro;
-using Serial;
+﻿using sNet.CScriptPro;
 using sNet.Client;
 using sNet.Server;
 using sNet.Services.Chat;
@@ -10,7 +9,7 @@ internal static class Program
 {
 	private static void Main()
 	{
-		var function = FunctionDefinition.ParseMain(@"C:\Users\redst\RiderProjects\sNet\sNet\script.csrp").Create();
+		var function = FunctionDefinition.ParseMain("scripts/script.csrp").Create();
 		
 		var value = function.Run();
 

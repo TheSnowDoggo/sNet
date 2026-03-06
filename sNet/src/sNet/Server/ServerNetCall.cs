@@ -1,6 +1,4 @@
-﻿using Serial;
-
-namespace sNet.Server;
+﻿namespace sNet.Server;
 
 public sealed class ServerNetCall : NetCall
 {

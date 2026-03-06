@@ -8,12 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Reference Include="cscriptpro">
-        <HintPath>..\..\CScriptPro\CScriptPro\bin\Debug\net9.0\cscriptpro.dll</HintPath>
-      </Reference>
-      <Reference Include="Serial">
-        <HintPath>..\..\Serial\Serial\bin\Debug\net9.0\Serial.dll</HintPath>
-      </Reference>
+      <None Remove="scripts\script.csrp" />
+      <Content Include="scripts\script.csrp">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <None Remove="scripts\base.part" />
+      <Content Include="scripts\base.part">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>
