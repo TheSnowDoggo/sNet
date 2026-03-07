@@ -9,7 +9,7 @@ public sealed class ClientPartRoot : PartRoot
 	public ConcurrentQueue<AddEvent> AddQueue { get; } = [];
 	public ConcurrentQueue<Uid> RemoveQueue { get; } = [];
 	public ConcurrentQueue<(Uid Uid, UpdateEvent[] Updates)> UpdateQueue { get; } = [];
-
+	
 	public override void Update(double delta)
 	{
 		base.Update(delta);
@@ -17,6 +17,15 @@ public sealed class ClientPartRoot : PartRoot
 		ProcessRemoveQueue();
 		ProcessAddQueue();
 		ProcessUpdateQueue();
+	}
+
+	public void Clear()
+	{
+		_registry.Clear();
+		
+		AddQueue.Clear();
+		RemoveQueue.Clear();
+		UpdateQueue.Clear();
 	}
 
 	private void ProcessAddQueue()

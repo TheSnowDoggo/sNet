@@ -38,6 +38,11 @@ public sealed class Event : Obj
 		Fire([]);
 	}
 
+	public void Clear()
+	{
+		_callbacks.Clear();
+	}
+
 	private static Event New(Obj[] args)
 	{
 		return new Event();

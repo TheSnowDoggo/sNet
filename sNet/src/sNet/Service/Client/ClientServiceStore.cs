@@ -71,6 +71,14 @@ public sealed class ClientServiceStore : IReadOnlyCollection<ClientService>
 		}
 	}
 
+	public void Disconnected()
+	{
+		foreach (var service in _services.Values)
+		{
+			service.Disconnected();
+		}
+	}
+
 	public void Clear()
 	{
 		_services.Clear();

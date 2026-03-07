@@ -9,6 +9,11 @@ namespace sNet;
 
 public static class SerialExtensions
 {
+	public static long Remaining(this Stream stream)
+	{
+		return stream.Length - stream.Position;
+	}
+	
 	public static int WriteNetByte(this Stream stream, byte value)
 	{
 		stream.WriteByte(value);

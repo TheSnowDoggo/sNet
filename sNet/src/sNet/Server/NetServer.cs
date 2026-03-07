@@ -135,7 +135,7 @@ public sealed class NetServer
 			return false;
 		}
 	}
-
+	
 	public async Task<bool> SendAsync<T>(int idx, Func<T, RentBuffer> format, T state)
 	{
 		try
@@ -210,8 +210,15 @@ public sealed class NetServer
 		{
 			_socket.Close();
 			_socket = null;
+
+			if (Interlocked.CompareExchange(ref _isActive, 0, 1) == 0)
+			{
+				return false;
+			}
 			
-			return Interlocked.CompareExchange(ref _isActive, 0, 1) == 0;
+			Logger.Info("Server shutting down.");
+			
+			return true;
 		}
 		catch (Exception ex)
 		{

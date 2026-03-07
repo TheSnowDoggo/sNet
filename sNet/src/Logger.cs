@@ -14,6 +14,7 @@ public static class Logger
 	public static TextWriter Out { get; set; } = Console.Out;
 	
 	public static string LastError { get; private set; }
+	public static string LastInfo { get; private set;}
 
 	public static void Initialize()
 	{
@@ -54,6 +55,8 @@ public static class Logger
 	public static void Info(string message)
 	{
 		Log($"[INFO] {message}");
+		
+		LastInfo = message;
 	}
 
 	public static void Error(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string filePath = "")

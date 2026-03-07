@@ -9,6 +9,10 @@ public abstract class ClientService : ServiceBase
 	public virtual void Receive(NetCall call)
 	{
 	}
+
+	public virtual void Disconnected()
+	{
+	}
 	
 	protected async Task<bool> SendAsync<T>(byte sid, T data)
 		where T : INetSerializable

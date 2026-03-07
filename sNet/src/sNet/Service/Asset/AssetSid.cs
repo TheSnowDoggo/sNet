@@ -1,6 +1,6 @@
 ﻿namespace sNet.Service.Asset;
 
-public enum AssetSid
+public enum AssetSid : byte
 {
 	SendIndex,
 	RequestAsset,

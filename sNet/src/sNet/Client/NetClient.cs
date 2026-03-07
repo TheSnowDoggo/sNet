@@ -13,6 +13,8 @@ public sealed class NetClient
 	{
 		Services = new ClientServiceStore(this);
 	}
+
+	public event Action Disconnected;
 	
 	public int MaxReceiveSize { get; init; } = int.MaxValue;
 	
@@ -60,7 +62,7 @@ public sealed class NetClient
 			return false;
 		}
 	}
-
+	
 	public async Task<bool> DisconnectAsync()
 	{
 		if (!Connected)
@@ -149,6 +151,9 @@ public sealed class NetClient
 		
 		_call?.Dispose();
 		_call = null;
+		
+		Services.Disconnected();
+		Disconnected?.Invoke();
 	}
 
 	private async Task ReceiveAsync(RentBuffer buffer)
@@ -198,6 +203,11 @@ public sealed class NetClient
 		}
 		catch (Exception ex)
 		{
+			if (!_socket.Connected)
+			{
+				return;
+			}
+			
 			Logger.Error(ex.Message);
 		}
 	}

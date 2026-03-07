@@ -11,9 +11,30 @@ public sealed class RemoteClient
 	
 	public Socket Socket { get; }
 	public int Idx { get; set; }
+	public Permission Permissions { get; private set; }
 
 	public override string ToString()
 	{
 		return $"[{Idx}] {Socket.RemoteEndPoint}";
+	}
+
+	public void Grant(Permission permissions)
+	{
+		Permissions |= permissions;
+	}
+
+	public void Revoke(Permission permissions)
+	{
+		Permissions &= ~permissions;
+	}
+	
+	public bool AuthorisedAny(Permission permissions)
+	{
+		return (Permissions & permissions) != 0;
+	}
+
+	public bool AuthorisedAll(Permission permissions)
+	{
+		return (Permissions & permissions) == permissions;
 	}
 }

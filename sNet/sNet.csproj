@@ -24,8 +24,4 @@
       </Reference>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="src\sNet\Service\Cmd\" />
-    </ItemGroup>
-
 </Project>
