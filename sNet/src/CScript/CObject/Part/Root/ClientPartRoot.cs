@@ -12,6 +12,8 @@ public sealed class ClientPartRoot : PartRoot
 
 	public override void Update(double delta)
 	{
+		base.Update(delta);
+		
 		ProcessRemoveQueue();
 		ProcessAddQueue();
 		ProcessUpdateQueue();
@@ -42,6 +44,8 @@ public sealed class ClientPartRoot : PartRoot
 			}
 
 			Register(part);
+			
+			Script.RunScripts(part, ScriptFlag.Client);
 		}
 	}
 

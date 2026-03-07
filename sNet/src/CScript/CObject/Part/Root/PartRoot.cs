@@ -14,6 +14,7 @@ public abstract class PartRoot
 
 	public virtual void Update(double delta)
 	{
+		Event.Update.Fire([delta]);
 	}
 
 	public virtual void PartAdded(Part root)

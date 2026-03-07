@@ -13,6 +13,9 @@ public readonly struct TypeSet : IEquatable<TypeSet>
     
     public static implicit operator TypeSet((TypeId, TypeId) tuple)
         => new  TypeSet(tuple.Item1, tuple.Item2);
+    
+    public static bool operator ==(TypeSet left, TypeSet right) => left.Equals(right);
+    public static bool operator !=(TypeSet left, TypeSet right) => !left.Equals(right);
 
     public bool Equals(TypeSet other)
     {

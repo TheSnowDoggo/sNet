@@ -14,6 +14,8 @@ public sealed class ServerPartRoot : PartRoot
 
 	public override void Update(double delta)
 	{
+		base.Update(delta);
+		
 		if (Service == null)
 		{
 			return;
