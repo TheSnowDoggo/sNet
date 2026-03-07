@@ -9,5 +9,6 @@ public static class Global
         { "Vec2", Vec2Obj.Export },
         { "Part", Part.Export },
         { "Uid", UidObj.Export },
+        { "Event", Event.Export },
     }.ToFrozenDictionary();
 }
