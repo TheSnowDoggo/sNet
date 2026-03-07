@@ -136,6 +136,20 @@ public sealed class NetServer
 		}
 	}
 
+	public async Task<bool> SendAsync<T>(int idx, Func<T, RentBuffer> format, T state)
+	{
+		try
+		{
+			using var buffer = format(state);
+			return await SendAsync(idx, buffer);
+		}
+		catch (Exception ex)
+		{
+			Logger.Error(ex.Message);
+			return false;
+		}
+	}
+
 	public async Task<bool> BroadcastAsync(RentBuffer buffer, HashSet<int> exclude = null)
 	{
 		try
@@ -164,6 +178,20 @@ public sealed class NetServer
 		}
 	}
 
+	public async Task<bool> BroadcastAsync<T>(Func<T, RentBuffer> format, T state, HashSet<int> exclude = null)
+	{
+		try
+		{
+			using var buffer = format(state);
+			return await BroadcastAsync(buffer, exclude);
+		}
+		catch (Exception ex)
+		{
+			Logger.Error(ex.Message);
+			return false;
+		}
+	}
+	
 	public bool Kick(int idx)
 	{
 		if (!Clients.HasClient(idx))
@@ -281,6 +309,8 @@ public sealed class NetServer
 
 				Clients.Add(client);
 				_clientInfo[client.Idx] = new ClientInfo(RentBuffer.Share(Constants.BufferSize));
+				
+				Logger.Info($"Client {client} joined.");
 				
 				Services.ClientJoined(client);
 				ClientJoined?.Invoke(client);

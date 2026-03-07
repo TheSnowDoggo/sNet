@@ -18,10 +18,8 @@ public sealed class ServerPartRoot : PartRoot
 		{
 			return;
 		}
-
-		Service.BroadcastAsync(PartSid.Remove, RemoveNetPack, ServerPartService.MaxRemoveSize).Wait();
-		Service.BroadcastAsync(PartSid.Add, AddNetPack, ServerPartService.MaxAddSize).Wait();
-		Service.BroadcastAsync(PartSid.Update, UpdateNetPack, ServerPartService.MaxUpdateSize).Wait();
+		
+		Task.WaitAll(Service.BroadcastRemove(RemoveNetPack), Service.BroadcastAdd(AddNetPack), Service.BroadcastUpdate(UpdateNetPack));
 	}
 
 	public override void PartAdded(Part root)

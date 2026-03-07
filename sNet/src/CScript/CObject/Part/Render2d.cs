@@ -58,6 +58,7 @@ public abstract class Render2d : Part2d
 
 	public override void Deserialize(Stream stream)
 	{
+		base.Deserialize(stream);
 		Layer = stream.ReadNetDouble();
 		Anchor = stream.ReadNetUtf8();
 	}

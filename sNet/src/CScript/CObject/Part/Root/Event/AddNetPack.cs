@@ -20,11 +20,11 @@ public sealed class AddNetPack : INetSerializable
             throw new InvalidDataException($"Queue count (\'{count}\') was negative.");
         }
 
-        var queue = new Queue<AddEvent>();
+        var queue = new Queue<AddEvent>(count);
 
         for (int i = 0; i < count; i++)
         {
-            var parent = (Uid)stream.ReadUid();
+            var parent = (Uid)stream.ReadNetInt64();
             var part = stream.ReadPart();
             
             queue.Enqueue(new AddEvent(parent, part));
@@ -38,10 +38,10 @@ public sealed class AddNetPack : INetSerializable
         var queue = Interlocked.Exchange(ref _queue, []);
         
         serial.WriteInt32(queue.Count);
-
+    
         while (queue.TryDequeue(out var part))
         {
-            serial.WriteUid(part.Parent?.Uid ?? Uid.Null);
+            serial.WriteInt64(part.Parent?.Uid ?? Uid.Null);
             serial.WritePart(part);
         }
     }

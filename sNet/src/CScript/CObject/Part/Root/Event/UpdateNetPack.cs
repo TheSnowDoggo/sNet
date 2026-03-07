@@ -26,7 +26,7 @@ public sealed class UpdateNetPack : INetSerializable
 
 		for (int i = 0; i < queueCount; i++)
 		{
-			var uid = stream.ReadUid();
+			var uid = (Uid)stream.ReadNetInt64();
 			var updateCount = stream.ReadNetInt32();
 
 			if (updateCount < 0)
@@ -58,7 +58,7 @@ public sealed class UpdateNetPack : INetSerializable
 
 		foreach (var (uid, updates) in data)
 		{
-			serial.WriteUid(uid);
+			serial.WriteInt64(uid);
 			serial.WriteInt32(updates.Count);
 
 			foreach (var (name, value) in updates)

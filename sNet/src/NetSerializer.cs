@@ -112,11 +112,6 @@ public class NetSerializer : IDisposable
 		WrittenBytes += _stream.WritePart(value);
 	}
 
-	public void WriteUid(Uid value)
-	{
-		WrittenBytes += _stream.WriteUid(value);
-	}
-
 	/// <summary>
 	/// Writes the byte count header at the start
 	/// </summary>

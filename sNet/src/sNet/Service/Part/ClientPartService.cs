@@ -40,6 +40,8 @@ public class ClientPartService : ClientService
 			}
 
 			var queue = AddNetPack.Deserialize(call.Stream);
+			
+			Logger.Info($"Received add package with {queue.Count} queued.");
 
 			while (queue.TryDequeue(out var addEvent))
 			{

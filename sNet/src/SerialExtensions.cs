@@ -353,7 +353,7 @@ public static class SerialExtensions
 			TypeId.Table => stream.ReadTable(),
 			TypeId.Vec2 => stream.ReadVec2(),
 			TypeId.Part => stream.ReadPart(),
-			TypeId.Uid => stream.ReadUid(),
+			TypeId.Uid => stream.ReadNetInt64(),
 			_ => throw new InvalidEnumArgumentException(nameof(type), (int)type, typeof(TypeId)),
 		};
 	}
@@ -412,10 +412,5 @@ public static class SerialExtensions
 	public static Part ReadPart(this Stream stream)
 	{
 		return Part.DeserializeNew(stream);
-	}
-
-	public static UidObj ReadUid(this Stream stream)
-	{
-		return (Uid)stream.ReadNetInt64();
 	}
 }

@@ -69,7 +69,7 @@ public static class Logger
 		
 		Out?.WriteLine(message);
 		
-		_streamWriter?.WriteLine(content);
+		_streamWriter?.WriteLine(message);
 		_streamWriter?.Flush();
 	}
 }

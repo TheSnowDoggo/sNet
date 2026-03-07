@@ -11,4 +11,9 @@ public sealed class RemoteClient
 	
 	public Socket Socket { get; }
 	public int Idx { get; set; }
+
+	public override string ToString()
+	{
+		return $"[{Idx}] {Socket.RemoteEndPoint}";
+	}
 }

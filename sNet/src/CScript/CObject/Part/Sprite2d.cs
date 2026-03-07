@@ -15,6 +15,8 @@ public sealed class Sprite2d : Render2d
 		set => ObserveSet(ref _source, value, "source");
 	}
 
+	public override PartType PartType => PartType.Sprite2d;
+
 	protected override string[] Properties => [..base.Properties, "source"];
 
 	public override Obj this[Obj key]

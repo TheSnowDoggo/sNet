@@ -10,6 +10,8 @@ public sealed class Camera2d : Part2d
 		set => ObserveSet(ref _channel, value, "channel");
 	}
 
+	public override PartType PartType => PartType.Camera2d;
+
 	protected override string[] Properties => [..base.Properties, "channel"];
 
 	public override Obj this[Obj key]
@@ -42,6 +44,7 @@ public sealed class Camera2d : Part2d
 
 	public override void Deserialize(Stream stream)
 	{
-		Channel = stream.ReadNetInt64();
+		base.Deserialize(stream);
+		Channel = stream.ReadNetDouble();
 	}
 }
