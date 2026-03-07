@@ -16,19 +16,21 @@ public sealed class IOPackage : Package
 	public override string Name => "IO";
 	public override Obj Export => Exports;
 
+	public static TextWriter Out { get; set; } = Console.Out;
+
 	private static void Print(Obj[] args)
 	{
-		Console.Write(string.Join<Obj>("", args));
+		Out.Write(string.Join<Obj>("", args));
 	}
 	
 	private static void PrintLine(Obj[] args)
 	{
-		Console.WriteLine(string.Join<Obj>("", args));
+		Out.WriteLine(string.Join<Obj>("", args));
 	}
 
 	private static Obj Require(Obj[] args)
 	{
-		string filepath = (string)(StrObj)args[0];
+		var filepath = (string)args[0];
 		
 		var result = FunctionDefinition.ParseMain(filepath).Create().Run();
 		

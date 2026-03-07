@@ -66,6 +66,23 @@ public sealed class PartTag
         return Parse(PartTokenizer.TokenizeFile(filepath));
     }
 
+    public static List<PartTag> ParseAll(PartStream stream)
+    {
+        var tags = new List<PartTag>();
+
+        while (!stream.EndOfStream())
+        {
+            tags.Add(Parse(stream));
+        }
+        
+        return tags;
+    }
+
+    public static List<PartTag> ParseAll(string filepath)
+    {
+        return ParseAll(PartTokenizer.TokenizeFile(filepath));
+    }
+
     public Part Create()
     {
         var part = Part.Create(PartType);

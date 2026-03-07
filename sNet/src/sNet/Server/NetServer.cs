@@ -61,6 +61,8 @@ public sealed class NetServer
 	public ClientStore Clients { get; }
 	public ServerServiceStore Services { get; }
 
+	public string EndPointName => _socket?.LocalEndPoint?.ToString();
+	
 	public bool Bind()
 	{
 		try
@@ -80,7 +82,7 @@ public sealed class NetServer
 			return false;
 		}
 	}
-
+	
 	public bool Start()
 	{
 		if (Interlocked.Exchange(ref _isActive, 1) != 0)
@@ -241,6 +243,8 @@ public sealed class NetServer
 			
 			try
 			{
+				string clientStr = client.ToString();
+				
 				Services.ClientLeft(client);
 				ClientLeft?.Invoke(client);
 				
@@ -251,6 +255,8 @@ public sealed class NetServer
 				info.NetCall?.Dispose();
 				
 				_clientInfo[idx] = null;
+				
+				Logger.Info($"Client {clientStr} quit.");
 			}
 			catch (Exception ex)
 			{
@@ -311,7 +317,7 @@ public sealed class NetServer
 		
 		var client = (RemoteClient)state;
 		var info = _clientInfo[client.Idx];
-		
+
 		try
 		{
 			if (!client.Socket.Connected)
@@ -342,12 +348,13 @@ public sealed class NetServer
 						_quitQueue.Enqueue(client.Idx);
 						break;
 					}
-					
+
 					info.NetCall = new ServerNetCall(client, RentBuffer.Share(messageSize));
 				}
-				
+
 				// Smaller betweeen: Total remaining bytes AND Remaining bytes in stream
-				int count = Math.Min(info.NetCall.End - (int)info.NetCall.Stream.Position, received - (int)stream.Position);
+				int count = Math.Min(info.NetCall.End - (int)info.NetCall.Stream.Position,
+					received - (int)stream.Position);
 
 				for (int i = 0; i < count; i++)
 				{
@@ -356,19 +363,27 @@ public sealed class NetServer
 
 				if (info.NetCall.Stream.Position < info.NetCall.End)
 				{
-					continue;	
+					continue;
 				}
-				
+
 				_ = new TaskFactory().StartNew(RunCallback, info.NetCall);
 				info.NetCall = null;
 			}
-			
-			info.EndReceiving();
 		}
 		catch (Exception ex)
 		{
-			Logger.Error(ex.ToString());
 			info.NetCall?.Dispose();
+
+			if (!client.Socket.Connected)
+			{
+				_quitQueue.Enqueue(client.Idx);
+				return;
+			}
+
+			Logger.Error(ex.Message);
+		}
+		finally
+		{
 			info.EndReceiving();
 		}
 	}

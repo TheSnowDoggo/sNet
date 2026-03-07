@@ -13,7 +13,7 @@ public sealed class Script : Part
 	public override PartType PartType => PartType.Script;
 
 	protected override string[] Properties => [..base.Properties, "source"];
-
+	
 	public override Obj this[Obj key]
 	{
 		get => key.TypeId != TypeId.String ? Nil.Value : (string)key switch
@@ -46,5 +46,21 @@ public sealed class Script : Part
 	{
 		base.Deserialize(stream);
 		Source = stream.ReadNetUtf8();
+	}
+
+	public void Run()
+	{
+		if (!ScriptLoader.Default.TryGet(Source, out var definition))
+		{
+			return;
+		}
+
+		var context = new Context();
+		
+		context.CreateScope();
+		context.Define("script", this);
+		context.Define("root", (Obj)Root?.Root ?? Nil.Value);
+
+		definition.Create(context).Run();
 	}
 }

@@ -51,7 +51,7 @@ public class Part : Obj
 	
 	public Part Parent { get; private set; }
 	
-	protected virtual string[] Properties => ["name", "enabled"];
+	protected virtual string[] Properties => ["name", "enabled", "visible"];
 	
 	public override Obj this[Obj key]
 	{

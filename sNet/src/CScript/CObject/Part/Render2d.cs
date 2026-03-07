@@ -4,7 +4,7 @@ namespace sNet.CScriptPro;
 
 public abstract class Render2d : Part2d
 {
-	private Number _layer;
+	private Number _layer = 0;
 	
 	public Number Layer
 	{
@@ -12,7 +12,7 @@ public abstract class Render2d : Part2d
 		set => ObserveSet(ref _layer, value, "layer");
 	}
 
-	private StrObj _anchor;
+	private StrObj _anchor = StrObj.Empty;
 
 	public StrObj Anchor
 	{
