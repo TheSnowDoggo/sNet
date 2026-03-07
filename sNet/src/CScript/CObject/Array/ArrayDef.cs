@@ -2,8 +2,8 @@
 
 public sealed class ArrayDef : Obj
 {
-	public ArrayDef() : base(TypeId.Nil) { }
-	
+	public override TypeId TypeId => TypeId.Nil;
+
 	public List<List<CsrToken>> Expressions { get; init; }
 
 	public static ArrayDef Parse(CsrTokenStream stream)

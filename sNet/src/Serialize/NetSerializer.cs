@@ -112,6 +112,17 @@ public class NetSerializer : IDisposable
 		WrittenBytes += _stream.WritePart(value);
 	}
 
+	public async Task WriteStreamAsync(Stream stream)
+	{
+		if (stream.Length + _stream.Position > int.MaxValue)
+		{
+			throw new InvalidOperationException($"Stream exceeds maximum size of {int.MaxValue}.");
+		}
+		
+		await stream.CopyToAsync(_stream);
+		WrittenBytes += (int)stream.Length;
+	}
+
 	/// <summary>
 	/// Writes the byte count header at the start
 	/// </summary>

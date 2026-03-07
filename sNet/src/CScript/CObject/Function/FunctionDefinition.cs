@@ -2,7 +2,7 @@
 
 public sealed class FunctionDefinition : Obj
 {
-	public FunctionDefinition() : base(TypeId.Nil) { }
+	public override TypeId TypeId => TypeId.Nil;
 
 	public string[] Args { get; init; }
 	

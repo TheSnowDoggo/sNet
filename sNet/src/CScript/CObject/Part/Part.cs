@@ -14,8 +14,7 @@ public class Part : Obj
 		{ "load", GlobalFunction.Create(Load, TypeId.String) },
 	}.ToFrozenDictionary();
 
-	public Part()
-		: base(TypeId.Part) { }
+	public override TypeId TypeId => TypeId.Part;
 
 	public virtual PartType PartType => PartType.Part;
 	

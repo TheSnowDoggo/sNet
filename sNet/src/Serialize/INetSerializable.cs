@@ -2,7 +2,7 @@
 
 public interface INetSerializable
 {
-	bool IsEmpty { get; }
+	public int MaxSize { get; }
 	
 	public void Serialize(NetSerializer serial);
 }

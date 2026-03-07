@@ -12,4 +12,5 @@ public enum TypeId : byte
 	Vec2,
 	Part,
 	Uid,
+	Event,
 }

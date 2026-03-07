@@ -3,10 +3,11 @@
 public sealed class TypeObj : Obj
 {
 	public TypeObj(TypeId id)
-		: base(TypeId.Nil)
 	{
 		Id = id;
 	}
-	
+
+	public override TypeId TypeId => TypeId.Nil;
+
 	public TypeId Id { get; }
 }

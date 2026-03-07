@@ -10,12 +10,13 @@ public class ReadOnlyTable : Obj,
 	private readonly IReadOnlyDictionary<Obj, Obj> _dictionary;
 	
 	public ReadOnlyTable(IReadOnlyDictionary<Obj, Obj> dictionary)
-		: base(TypeId.Table)
 	{
 		_dictionary = dictionary;
 	}
 	
 	public int Count => _dictionary.Count;
+
+	public override TypeId TypeId => TypeId.Table;
 
 	public IEnumerable<Obj> Keys => _dictionary.Keys;
 	public IEnumerable<Obj> Values => _dictionary.Values;

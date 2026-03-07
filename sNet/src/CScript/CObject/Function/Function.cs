@@ -4,7 +4,7 @@ public abstract class Function : Obj
 {
 	public const int AnyArgs = -1;
 	
-	public Function() : base(TypeId.Function) { }
+	public override TypeId TypeId => TypeId.Function;
 	
 	public int MinArgs { get; init; }
 	public int MaxArgs { get; init; }

@@ -1,11 +1,15 @@
 ﻿namespace sNet.CScriptPro;
 
-public sealed class RemoveNetPack : INetSerializable
+public sealed class RemoveNetPack : INetPackage
 {
+	public const int MaxRemoveSize = 1024;
+	
 	private HashSet<Uid> _removes = [];
 
 	public bool IsEmpty => _removes.Count == 0;
-	
+
+	public int MaxSize => MaxRemoveSize;
+
 	public bool Enqueue(Uid part)
 	{
 		return _removes.Add(part);	

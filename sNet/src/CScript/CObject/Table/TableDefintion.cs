@@ -7,10 +7,11 @@ public sealed class TableDefinition : Obj
 	private readonly List<Pair> _items;
 
 	private TableDefinition(List<Pair> items)
-		: base(TypeId.Nil)
 	{
 		_items = items;
 	}
+
+	public override TypeId TypeId => TypeId.Nil;
 
 	public static TableDefinition Parse(CsrTokenStream stream)
 	{

@@ -4,4 +4,6 @@ public enum AssetSid
 {
 	SendIndex,
 	RequestAsset,
+	SendAsset,
+	RequestDenied,
 }

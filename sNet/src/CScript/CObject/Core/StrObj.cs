@@ -7,13 +7,14 @@ public sealed class StrObj : Obj,
 	private readonly string _value;
 	
 	public StrObj(string value)
-		: base(TypeId.String)
 	{
 		_value = value;
 	}
 	
 	public int Length => _value.Length;
-	
+
+	public override TypeId TypeId => TypeId.String;
+
 	public static StrObj Empty { get; } = new StrObj(string.Empty);
 	
 	public static implicit operator StrObj(string value) => new StrObj(value);

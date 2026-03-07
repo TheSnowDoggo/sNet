@@ -1,10 +1,14 @@
 namespace sNet.CScriptPro;
 
-public sealed class AddNetPack : INetSerializable
+public sealed class AddNetPack : INetPackage
 {
+    public const int MaxAddSize = 4096;
+    
     private Queue<Part> _queue = [];
 
     public bool IsEmpty => _queue.Count == 0;
+    
+    public int MaxSize => MaxAddSize;
 
     public void Enqueue(Part part)
     {

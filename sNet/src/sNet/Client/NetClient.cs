@@ -123,6 +123,20 @@ public sealed class NetClient
 			return false;
 		}
 	}
+	
+	public async Task<bool> SendAsync<T>(Func<T, RentBuffer> format, T state)
+	{
+		try
+		{
+			using var buffer = format(state);
+			return await SendAsync(buffer);
+		}
+		catch (Exception ex)
+		{
+			Logger.Error(ex.Message);
+			return false;
+		}
+	}
 
 	private async Task Run()
 	{

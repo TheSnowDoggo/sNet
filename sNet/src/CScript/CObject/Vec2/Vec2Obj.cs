@@ -19,15 +19,16 @@ public sealed class Vec2Obj : Obj,
     }.ToFrozenDictionary();
     
     public Vec2Obj(Vector2 value)
-        : base(TypeId.Vec2)
     {
         _value = value;
     }
     
     public Vec2Obj(Number x, Number y)
-        : this(new Vector2((double)x, (double)y))
     {
+        _value = new Vector2((double)x, (double)y);
     }
+
+    public override TypeId TypeId => TypeId.Vec2;
 
     public static implicit operator Vec2Obj(Vector2 v) => new Vec2Obj(v);
     public static implicit operator Vector2(Vec2Obj v) => v._value;

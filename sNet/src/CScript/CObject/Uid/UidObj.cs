@@ -12,10 +12,11 @@ public sealed class UidObj : Obj, IEquatable<UidObj>
 	private readonly Uid _value;
 
 	public UidObj(Uid value)
-		: base(TypeId.Uid)
 	{
 		_value = value;
 	}
+
+	public override TypeId TypeId => TypeId.Uid;
 
 	public static implicit operator Uid(UidObj value) => value._value;
 	public static implicit operator UidObj(Uid value) => new UidObj(value);

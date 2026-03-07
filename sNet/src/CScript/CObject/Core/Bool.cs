@@ -5,10 +5,11 @@ public sealed class Bool : Obj, IEquatable<Bool>
 	private readonly bool _value;
 
 	public Bool(bool value)
-		: base(TypeId.Bool)
 	{
 		_value = value;
 	}
+
+	public override TypeId TypeId => TypeId.Bool;
 
 	public static Bool True { get; } = new Bool(true);
 	public static Bool False { get; } = new Bool(false);

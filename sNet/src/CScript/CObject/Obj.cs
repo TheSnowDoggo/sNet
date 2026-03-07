@@ -4,12 +4,7 @@ namespace sNet.CScriptPro;
 
 public abstract class Obj
 {
-	public Obj(TypeId typeId)
-	{
-		TypeId = typeId;
-	}
-	
-	public TypeId TypeId { get; }
+	public abstract TypeId TypeId { get; }
 
 	public virtual Obj this[Obj key]
 	{

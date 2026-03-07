@@ -5,7 +5,7 @@ namespace sNet.CScriptPro;
 public abstract class ArrayBaseObj : Obj,
 	IReadOnlyList<Obj>
 {
-	public ArrayBaseObj() : base(TypeId.Array) { }
+	public override TypeId TypeId => TypeId.Array;
 
 	public abstract int Count { get; }
 

@@ -10,11 +10,12 @@ public sealed class Number : Obj,
 	private readonly double _value;
 
 	public Number(double value)
-		: base(TypeId.Number)
 	{
 		_value = value;
 	}
-	
+
+	public override TypeId TypeId => TypeId.Number;
+
 	public static implicit operator Number(double value) => new Number(value);
 	public static implicit operator double(Number value) => value._value;
 	
