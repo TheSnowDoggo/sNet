@@ -5,8 +5,8 @@ public sealed class FunctionDefinition : Obj
 	public override TypeId TypeId => TypeId.Nil;
 
 	public string[] Args { get; init; }
-	
 	public List<Statement> Statements { get; init;  }
+	public string Name { get; set; }
 	
 	public static FunctionDefinition ParseMain(CsrTokenStream stream)
 	{
@@ -66,6 +66,7 @@ public sealed class FunctionDefinition : Obj
 		{
 			Args = args.ToArray(),
 			Statements = statements,
+			Name = "__anonymous",
 		};
 	}
 
@@ -78,6 +79,7 @@ public sealed class FunctionDefinition : Obj
 		var name = stream.Consume(CsrId.Identifier).Lexeme;
 		
 		var definition = ParseLambda(stream);
+		definition.Name = name;
 
 		return new DefineStatement(line)
 		{
@@ -92,6 +94,7 @@ public sealed class FunctionDefinition : Obj
 		Parent = context,
 		Args = Args,
 		Statements = Statements,
+		RuntimeName = Name,
 		MinArgs = 0,
 		MaxArgs = Args.Length,
 	};

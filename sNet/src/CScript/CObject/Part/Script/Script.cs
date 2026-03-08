@@ -1,61 +1,29 @@
-﻿namespace sNet.CScriptPro;
+﻿using System.Collections.Frozen;
+
+namespace sNet.CScriptPro;
 
 public sealed class Script : Part
 {
-	private StrObj _source = StrObj.Empty;
-
-	public StrObj Source
+	public new static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>(Part.GlobalProperties)
 	{
-		get => _source;
-		set => ObserveSet(ref _source, value, "source");
-	}
-
-	private StrObj _type = "server";
-
-	public StrObj Type
-	{
-		get => _type;
-		set => ObserveSet(ref _type, value, "type");
-	}
+		{ "source", new GSProperty<Script, StrObj>(p => p.Source, (p, v) => p.Source = v, TypeId.String) },
+		{ "type", new GSProperty<Script, StrObj>(p => p.Type, (p, v) => p.Type = v, TypeId.String) },
+	}.ToFrozenDictionary();
+	
+	public StrObj Source { get; set; } = StrObj.Empty;
+	public StrObj Type { get; set; } = "server";
 	
 	public override PartType PartType => PartType.Script;
 
-	protected override string[] Properties => [..base.Properties, "source", "type"];
-	
-	public ScriptFlag Flags => _type.ToString().ToLower() switch
+	public override IReadOnlyDictionary<string, IProperty> Properties => GlobalProperties;
+
+	public ScriptFlag Flags => Type.ToString().ToLower() switch
 	{
 		"server" => ScriptFlag.Server,
 		"client" => ScriptFlag.Client,
 		"both" => ScriptFlag.Server | ScriptFlag.Client,
 		_ => ScriptFlag.Server,
 	};
-	
-	public override Obj this[Obj key]
-	{
-		get => key.TypeId != TypeId.String ? Nil.Value : (string)key switch
-		{
-			"source" => Source,
-			"type" => Type,
-			_ => base[key],
-		};
-		set
-		{
-			if (key.TypeId != TypeId.String) return;
-
-			switch ((string)key)
-			{
-			case "source":
-				Source = (StrObj)value.Expect(TypeId.String);
-				break;
-			case "type":
-				Type = (StrObj)value.Expect(TypeId.String);
-				break;
-			default:
-				base[key] = value;
-				break;
-			}
-		}
-	}
 	
 	public static void RunScripts(Part root, ScriptFlag flags)
 	{
@@ -91,20 +59,6 @@ public sealed class Script : Part
 				queue.Enqueue(child);
 			}
 		}
-	}
-
-	public override int Serialize(Stream stream)
-	{
-		return base.Serialize(stream) 
-		       + stream.WriteNetUtf8(Source)
-		       + stream.WriteNetUtf8(Type);
-	}
-
-	public override void Deserialize(Stream stream)
-	{
-		base.Deserialize(stream);
-		Source = stream.ReadNetUtf8();
-		Type = stream.ReadNetUtf8();
 	}
 
 	public bool Run(ScriptFlag source)

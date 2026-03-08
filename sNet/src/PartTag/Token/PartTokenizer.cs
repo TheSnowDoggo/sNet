@@ -15,11 +15,14 @@ public sealed class PartTokenizer : Tokenizer<PartId, PartToken>
         { ':', PartId.Colon },
         { ',', PartId.Comma },
         { '!', PartId.Bang },
+        { '.', PartId.Period },
     }.ToFrozenDictionary();
 
     private static readonly FrozenDictionary<string, PartId> Keywords = new Dictionary<string, PartId>()
     {
         { "Vec2", PartId.Vec2 },
+        { "Key", PartId.Key },
+        { "Color", PartId.Color },
     }.ToFrozenDictionary();
     
     public PartTokenizer(TextReader reader)

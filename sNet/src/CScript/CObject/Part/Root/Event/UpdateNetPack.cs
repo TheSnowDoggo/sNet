@@ -43,7 +43,7 @@ public sealed class UpdateNetPack : INetPackage
 			for (int j = 0; j < updateCount; j++)
 			{
 				var name = stream.ReadNetUtf8();
-				var value = stream.ReadCObj();
+				var value = stream.ReadObj();
 				
 				updates[j] = new UpdateEvent(name, value);
 			}

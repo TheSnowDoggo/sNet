@@ -1,4 +1,6 @@
 using System.Collections.Frozen;
+using SCENeo;
+using SCENeo.Input;
 
 namespace sNet.CScriptPro;
 
@@ -10,5 +12,7 @@ public static class Global
         { "Part", Part.Export },
         { "Uid", UidObj.Export },
         { "Event", Event.Export },
+        { "Key", new EnumTable<Key>() },
+        { "Color", new EnumTable<SCEColor>() },
     }.ToFrozenDictionary();
 }

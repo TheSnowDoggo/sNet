@@ -4,7 +4,7 @@ namespace sNet.CScriptPro;
 
 public sealed class Event : Obj
 {
-	private readonly WeakSet<Function> _callbacks = [];
+	private readonly HashSet<Function> _callbacks = [];
 	
 	public static readonly Event Update = new Event();
 
@@ -29,7 +29,7 @@ public sealed class Event : Obj
 	{
 		foreach (var callback in _callbacks)
 		{
-			callback.Run(args);
+			callback.TryRun(args);
 		}
 	}
 

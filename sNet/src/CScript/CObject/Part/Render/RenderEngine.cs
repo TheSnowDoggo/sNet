@@ -60,6 +60,11 @@ public sealed class RenderEngine
 		}
 	}
 
+	private static Vector2 ToRenderCoords(Vector2 position)
+	{
+		return position.Rounded() * new Vector2(2, 1);
+	}
+
 	private void Draw()
 	{
 		_inputs.Sort();
@@ -80,10 +85,10 @@ public sealed class RenderEngine
 
 				var size = inInfo.Renderable.Size();
 				
-				Vec2I screenOffset = (Vec2I)(inInfo.Position.Rounded() - outInfo.Position.Rounded());
+				Vec2I screenOffset = (Vec2I)(ToRenderCoords(inInfo.Position) - ToRenderCoords(outInfo.Position));
 				screenOffset += inInfo.Renderable.Offset + inInfo.Anchor.AnchorDimension(size) - size;
 				
-				Vec2I screenEnd = screenOffset + screenOffset;
+				Vec2I screenEnd = screenOffset + size;
 
 				if (!screenArea.Overlaps(screenOffset, screenEnd))
 				{
@@ -191,9 +196,9 @@ public sealed class RenderEngine
 			"bl" => Anchor.Bottom,
 			"bc" => Anchor.Bottom | Anchor.Center,
 			"br" => Anchor.Bottom | Anchor.Right,
-			"cl" => Anchor.Center,
-			"cm" => Anchor.Center | Anchor.Middle,
-			"cr" => Anchor.Center | Anchor.Right,
+			"ml" => Anchor.Middle,
+			"mc" => Anchor.Middle | Anchor.Middle,
+			"mr" => Anchor.Middle | Anchor.Right,
 			_ => (Anchor)(-1),
 		};
 

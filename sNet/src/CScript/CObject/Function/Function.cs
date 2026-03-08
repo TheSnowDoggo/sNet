@@ -6,6 +6,8 @@ public abstract class Function : Obj
 	
 	public override TypeId TypeId => TypeId.Function;
 	
+	public abstract string Name { get; }
+	
 	public int MinArgs { get; init; }
 	public int MaxArgs { get; init; }
 	public TypeId[] ArgTypes { get; init; }
@@ -14,12 +16,12 @@ public abstract class Function : Obj
 	{
 		if (args.Length < MinArgs)
 		{
-			throw new InterpreterException($"Function expected minimum of {MinArgs} arguments, got {args.Length}.");
+			throw new InterpreterException($"{Name}() expected minimum of {MinArgs} arguments, got {args.Length}.");
 		}
 
 		if (MaxArgs != AnyArgs && args.Length > MaxArgs)
 		{
-			throw new InterpreterException($"Function expected maximum of {MaxArgs} arguments, got {args.Length}.");
+			throw new InterpreterException($"{Name}() expected maximum of {MaxArgs} arguments, got {args.Length}.");
 		}
 
 		if (ArgTypes != null)
@@ -29,10 +31,24 @@ public abstract class Function : Obj
 
 		return Invoke(args);
 	}
-	
+
 	public Obj Run()
 	{
 		return Run([]);
+	}
+	
+	public bool TryRun(Obj[] args)
+	{
+		try
+		{
+			Run(args);
+			return true;
+		}
+		catch (Exception ex)
+		{
+			Logger.Error($"{Name}() exception: {ex.Message}");
+			return false;
+		}
 	}
 
 	protected abstract Obj Invoke(Obj[] args);
@@ -45,7 +61,7 @@ public abstract class Function : Obj
 		{
 			if (args[i].TypeId != ArgTypes[i])
 			{
-				throw new InterpreterException($"Function expected argument {i + 1} to be type {ArgTypes[i]}, got {args[i].TypeId}.");
+				throw new InterpreterException($"{Name}() expected argument {i + 1} to be type {ArgTypes[i]}, got {args[i].TypeId}.");
 			}
 		}
 	}

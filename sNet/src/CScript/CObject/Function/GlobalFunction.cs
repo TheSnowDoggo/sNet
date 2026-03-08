@@ -9,6 +9,8 @@ public sealed class GlobalFunction : Function
 		_func = func;
 	}
 
+	public override string Name => _func.Method.Name;
+
 	public static GlobalFunction Create(Func<Obj[], Obj> func, int minArgs, int maxArgs, params TypeId[] types) => new GlobalFunction(func)
 	{
 		MinArgs = minArgs,

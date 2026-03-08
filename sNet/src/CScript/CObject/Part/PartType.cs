@@ -7,4 +7,5 @@ public enum PartType
 	Script,
 	Camera2d,
 	Sprite2d,
+	Box2d,
 }

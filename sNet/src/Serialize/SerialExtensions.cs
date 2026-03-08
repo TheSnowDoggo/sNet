@@ -143,7 +143,7 @@ public static class SerialExtensions
 		return sizeof(int) + value.Length * sizeof(char);
 	}
 	
-	public static int WriteCObj(this Stream stream, Obj obj)
+	public static int WriteObj(this Stream stream, Obj obj)
 	{
 		stream.WriteByte((byte)obj.TypeId);
 
@@ -157,7 +157,7 @@ public static class SerialExtensions
 			TypeId.Table => stream.WriteTable((UserTable)obj),
 			TypeId.Vec2 => stream.WriteVec2((Vec2Obj)obj),
 			TypeId.Part => stream.WritePart((Part)obj),
-			TypeId.Uid => stream.WriteUid((UidObj)obj),
+			TypeId.Uid => stream.WriteNetInt64((Uid)(UidObj)obj),
 			_ => throw new InvalidOperationException($"Cannot serialize type {obj.TypeId}."),
 		};
 	}
@@ -170,7 +170,7 @@ public static class SerialExtensions
 
 		foreach (var item in arrayObj)
 		{
-			written += stream.WriteCObj(item);
+			written += stream.WriteObj(item);
 		}
 		
 		return written;
@@ -184,8 +184,8 @@ public static class SerialExtensions
 
 		foreach (var item in table)
 		{
-			written += stream.WriteCObj(item.Key);
-			written += stream.WriteCObj(item.Value);
+			written += stream.WriteObj(item.Key);
+			written += stream.WriteObj(item.Value);
 		}
 
 		return written;
@@ -199,11 +199,6 @@ public static class SerialExtensions
 	public static int WritePart(this Stream stream, Part part)
 	{
 		return part.Serialize(stream);
-	}
-
-	public static int WriteUid(this Stream stream, Uid uid)
-	{
-		return stream.WriteNetInt64(uid);
 	}
 
 	public static byte ReadExactByte(this Stream stream)
@@ -344,7 +339,7 @@ public static class SerialExtensions
 		}
 	}
 	
-	public static Obj ReadCObj(this Stream stream)
+	public static Obj ReadObj(this Stream stream)
 	{
 		var type = (TypeId)stream.ReadByte();
 
@@ -376,7 +371,7 @@ public static class SerialExtensions
 
 		for (int i = 0; i < count; i++)
 		{
-			list.Add(stream.ReadCObj());
+			list.Add(stream.ReadObj());
 		}
 
 		return new ArrayObj(list);
@@ -395,8 +390,8 @@ public static class SerialExtensions
 
 		for (int i = 0; i < count; i++)
 		{
-			var key = stream.ReadCObj();
-			var value = stream.ReadCObj();
+			var key = stream.ReadObj();
+			var value = stream.ReadObj();
 
 			if (!data.TryAdd(key, value))
 			{

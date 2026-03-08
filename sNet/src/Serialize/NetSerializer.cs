@@ -89,7 +89,7 @@ public class NetSerializer : IDisposable
 	
 	public void WriteCObj(Obj obj)
 	{
-		WrittenBytes += _stream.WriteCObj(obj);
+		WrittenBytes += _stream.WriteObj(obj);
 	}
 
 	public void WriteArray(ArrayObj value)

@@ -1,0 +1,23 @@
+﻿namespace sNet;
+
+public static class Extensions
+{
+	public static TValue GetValueOrCreate<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+		where TKey : notnull
+		where TValue : new()
+	{
+		return dictionary.TryGetValue(key, out TValue value) ? value : dictionary[key] = new TValue();
+	}
+
+	public static TEnum ParseOrDefault<TEnum>(string s, bool ignoreCase, TEnum defaultValue = default)
+		where TEnum : struct
+	{
+		return Enum.TryParse(s, ignoreCase, out TEnum value) ? value : defaultValue;
+	}
+	
+	public static TEnum ParseOrDefault<TEnum>(string s, TEnum defaultValue = default)
+		where TEnum : struct
+	{
+		return Enum.TryParse(s, out TEnum value) ? value : defaultValue;
+	}
+}

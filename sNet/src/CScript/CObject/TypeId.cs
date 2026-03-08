@@ -13,4 +13,5 @@ public enum TypeId : byte
 	Part,
 	Uid,
 	Event,
+	Enum,
 }

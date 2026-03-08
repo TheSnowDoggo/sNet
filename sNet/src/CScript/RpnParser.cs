@@ -35,6 +35,7 @@ public sealed class RpnParser
 		{ CsrId.Or, 3 },
 		{ CsrId.Assign, AssignPrecedence },
 		{ CsrId.OpenParen, int.MinValue },
+		{ CsrId.Comma, int.MinValue },
 	}.ToFrozenDictionary();
 
 	private static readonly FrozenDictionary<CsrId, CsrId> UnaryMap = new Dictionary<CsrId, CsrId>()
@@ -209,8 +210,13 @@ public sealed class RpnParser
 		throw new ParserException(_stream.Line, $"Unrecognized operator {csrToken.Type}.");
 	}
 
-	private bool ShouldFlush(CsrToken peek, CsrToken csrToken, int precedence)
+	private bool ShouldFlush(CsrToken peek,  int precedence)
 	{
+		if (IsOpen(peek) || peek.Type == CsrId.Comma)
+		{
+			return false;
+		}
+		
 		int opPrecedence = GetPrecedence(peek);
 
 		if (opPrecedence > precedence)
@@ -240,7 +246,7 @@ public sealed class RpnParser
 	{
 		int precedence = GetPrecedence(csrToken);
 
-		while (_opStack.TryPeek(out var op) && ShouldFlush(op, csrToken, precedence))
+		while (_opStack.TryPeek(out var op) && ShouldFlush(op, precedence))
 		{
 			TransferOperator();
 		}

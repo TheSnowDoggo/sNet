@@ -6,6 +6,10 @@ public sealed class UserFunction : Function
 	public string[] Args { get; init; }
 	public List<Statement> Statements { get; init; }
 	
+	public override string Name => RuntimeName;
+
+	public string RuntimeName { get; set; }
+	
 	protected override Obj Invoke(Obj[] args)
 	{
 		var context = new Context(Parent);

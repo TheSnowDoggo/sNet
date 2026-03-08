@@ -7,6 +7,20 @@ namespace sNet.CScriptPro;
 public class Part : Obj
 {
 	private readonly List<Part> _children = [];
+
+	public static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>()
+	{
+		{ "id", new GProperty<Part>(p => (StrObj)p.PartType.ToString()) },
+		{ "uid", new GProperty<Part>(p => (UidObj)p.Uid) },
+		{ "name", new GSProperty<Part, StrObj>(p => p.Name, (p, v) => p.Name = v, TypeId.String) },
+		{ "enabled", new GSProperty<Part, Bool>(p => p.Enabled, (p, v) => p.Enabled = v, TypeId.Bool) },
+		{ "visible", new GSProperty<Part, Bool>(p => p.Visible, (p, v) => p.Visible = v, TypeId.Bool) },
+		{ "parent", new GProperty<Part>(p => (Obj)p.Parent ?? Nil.Value) },
+		{ "children", new GProperty<Part>(p => new ArrayViewObj<Part>(p._children)) },
+		{ "addChild", new GProperty<Part>(p => GlobalFunction.Create(args => p.AddChild((Part)args[0]), TypeId.Part)) },
+		{ "removeChild", new GProperty<Part>(p => GlobalFunction.Create(args => p.RemoveChild((Part)args[0]), TypeId.Part)) },
+		{ "findFirstChild", new GProperty<Part>(p => GlobalFunction.Create(args => p.FindFirstChild((StrObj)args[0]), TypeId.String)) },
+	}.ToFrozenDictionary();
 	
 	public static readonly ReadOnlyTable Export = new Dictionary<Obj, Obj>()
 	{
@@ -20,69 +34,63 @@ public class Part : Obj
 	
 	public IReadOnlyList<Part> Children => _children.AsReadOnly();
 
-	private StrObj _name = StrObj.Empty;
-
-	public StrObj Name
-	{
-		get => _name;
-		set => ObserveSet(ref _name, value, "name");
-	}
-
-	private Bool _enabled = true;
-
-	public Bool Enabled
-	{
-		get => _enabled;
-		set => ObserveSet(ref _enabled, value, "enabled");
-	}
-
-	private Bool _visible = true;
-
-	public Bool Visible
-	{
-		get => _visible;
-		set => ObserveSet(ref _visible, value, "visible");
-	}
+	public StrObj Name { get; set; } = StrObj.Empty;
+	public Bool Enabled { get; set; } = true;
+	public Bool Visible { get; set; } = true;
 	
 	public Uid Uid { get; set; }
 	
 	public PartRoot Root { get; set; }
 	
 	public Part Parent { get; private set; }
-	
-	protected virtual string[] Properties => ["name", "enabled", "visible"];
+
+	public virtual IReadOnlyDictionary<string, IProperty> Properties => GlobalProperties;
 	
 	public override Obj this[Obj key]
 	{
-		get => key.TypeId != TypeId.String ? Nil.Value : (string)key switch
+		get
 		{
-			"id" => PartType.ToString(),
-			"name" => Name,
-			"enabled" => Enabled,
-			"visible" => Visible,
-			"parent" => (Obj)Parent ?? Nil.Value,
-			"children" => new ArrayViewObj<Part>(_children),
-			"addChild" => GlobalFunction.Create(args => AddChild((Part)args[0]), TypeId.Part),
-			"removeChild" => GlobalFunction.Create(args => RemoveChild((Part)args[0]), TypeId.Part),
-			"findFirstChild" => GlobalFunction.Create(args => FindFirstChild((StrObj)args[0]), TypeId.String),
-			_ => FindFirstChild((StrObj)key),	
-		};
+			if (key.TypeId != TypeId.String)
+			{
+				return Nil.Value;
+			}
+
+			var name = (string)key;
+
+			if (!Properties.TryGetValue(name, out IProperty property))
+			{
+				return FindFirstChild(name);
+			}
+
+			return property[this];
+		}
 		set
 		{
-			if (key.TypeId != TypeId.String) return;
-
-			switch ((string)key)
+			if (key.TypeId != TypeId.String)
 			{
-			case "name":
-				Name = value.Expect<StrObj>(TypeId.String);
-				break;
-			case "enabled":
-				Enabled = value.Expect<Bool>(TypeId.Bool);
-				break;
-			case "visible":
-				Visible = value.Expect<Bool>(TypeId.Bool);
-				break;
+				return;
 			}
+
+			var name = (string)key;
+
+			if (!Properties.TryGetValue(name, out IProperty property))
+			{
+				return;
+			}
+
+			if (!property.Serializable)
+			{
+				property[this] = value;
+				return;
+			}
+
+			if (EqualityComparer<Obj>.Default.Equals(property[this], value))
+			{
+				return;
+			}
+
+			property[this] = value;
+			Root?.PropertyUpdate(this, name, value);
 		}
 	}
 
@@ -93,6 +101,7 @@ public class Part : Obj
 		PartType.Script => new Script(),
 		PartType.Camera2d => new Camera2d(),
 		PartType.Sprite2d => new Sprite2d(),
+		PartType.Box2d => new Box2d(),
 		_ => throw new InvalidEnumArgumentException(nameof(partType), (int)partType, typeof(PartType)),
 	};
 
@@ -136,16 +145,25 @@ public class Part : Obj
 
 	public bool RemoveChild(Part child)
 	{
-		if (!_children.Remove(child))
+		return RemoveChild(_children.IndexOf(child));
+	}
+
+	public bool RemoveChild(int idx)
+	{
+		if (idx < 0 || idx >= _children.Count)
 		{
 			return false;
 		}
-
+		
+		var child = _children[idx];
+		
+		_children.RemoveAt(idx);
+		
 		child.Parent = null;
 		ParentUpdate();
 		
 		Root?.PartRemoved(child);
-		
+
 		return true;
 	}
 
@@ -169,13 +187,21 @@ public class Part : Obj
 		return sb.ToString();
 	}
 
-	public virtual int Serialize(Stream stream)
+	public int Serialize(Stream stream)
 	{
 		int bytes = stream.WriteNetByte((byte)PartType);
 
 		bytes += stream.WriteNetInt64(Uid);
-		bytes += stream.WriteNetUtf8(Name);
-		bytes += stream.WriteBoolean(Enabled);
+
+		foreach (var property in Properties.Values)
+		{
+			if (!property.Serializable)
+			{
+				continue;
+			}
+			
+			bytes += property.Serialize(this, stream);
+		}
 
 		bytes += stream.WriteNetInt32(_children.Count);
 		
@@ -187,11 +213,19 @@ public class Part : Obj
 		return bytes;
 	}
 
-	public virtual void Deserialize(Stream stream)
+	public void Deserialize(Stream stream)
 	{
 		Uid = stream.ReadNetInt64();
-		Name = stream.ReadNetUtf8();
-		Enabled = stream.ReadBoolean();
+		
+		foreach (var property in Properties.Values)
+		{
+			if (!property.Serializable)
+			{
+				continue;
+			}
+			
+			property.Deserialize(this, stream);
+		}
 
 		int count = stream.ReadNetInt32();
 
@@ -206,23 +240,16 @@ public class Part : Obj
 		}
 	}
 
-	protected virtual void ParentUpdate()
+	public void ClearChildren()
 	{
+		for (int i = _children.Count - 1; i >= 0; i--)
+		{
+			RemoveChild(i);
+		}
 	}
 
-	protected bool ObserveSet<T>(ref T property, T value, string name)
-		where T : Obj
+	protected virtual void ParentUpdate()
 	{
-		if (EqualityComparer<T>.Default.Equals(property, value))
-		{
-			return false;
-		}
-
-		property = value;
-		
-		Root?.PropertyUpdate(this, name, value);
-
-		return true;
 	}
 
 	private static Part New(Obj[] args)
@@ -286,7 +313,7 @@ public class Part : Obj
 		foreach (var property in Properties)
 		{
 			sb.Append(' ', (level + 1) * 2);
-			sb.AppendLine($"{property}: {this[property]},");
+			sb.AppendLine($"{property.Key}: {property.Value[this]},");
 		}
 		
 		foreach (var child in _children)

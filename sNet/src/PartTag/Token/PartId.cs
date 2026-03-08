@@ -11,9 +11,12 @@ public enum PartId
     Colon,
     Comma,
     Bang,
+    Period,
     
     Literal,
     Identifier,
     
     Vec2,
+    Key,
+    Color,
 }

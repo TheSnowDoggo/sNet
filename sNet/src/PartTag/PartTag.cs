@@ -1,4 +1,6 @@
 using System.Text;
+using SCENeo;
+using SCENeo.Input;
 
 namespace sNet.CScriptPro;
 
@@ -104,6 +106,8 @@ public sealed class PartTag
     {
         PartId.Literal => stream.Read().Value,
         PartId.Vec2 => ParseVec2(stream),
+        PartId.Key => ParseEnum<Key>(stream),
+        PartId.Color => ParseEnum<SCEColor>(stream),
         _ => throw new ParserException(stream.Line, $"Unrecognised value type {stream.Peek().Type}."),
     };
 
@@ -123,6 +127,22 @@ public sealed class PartTag
         stream.Consume(PartId.CloseParen);
 
         return new Vec2Obj((Number)x, (Number)y);
+    }
+
+    private static Number ParseEnum<TEnum>(PartStream stream)
+        where TEnum : struct, IConvertible
+    {
+        stream.Read();
+        stream.Consume(PartId.Period);
+        
+        var name = stream.Consume(PartId.Identifier).Lexeme;
+
+        if (!Enum.TryParse<TEnum>(name, true, out var key))
+        {
+            throw new ParserException(stream.Line, $"Unrecognised {typeof(TEnum).Name} {name}.");
+        }
+
+        return key.ToInt32(null);
     }
     
     private void Format(StringBuilder sb, int level)

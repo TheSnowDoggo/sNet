@@ -133,6 +133,8 @@ public sealed class ClientAssetService : ClientService
 	{
 		try
 		{
+			Directory.CreateDirectory(AssetDirectory);
+			
 			Index = AssetIndex.Deserialize(AssetDirectory, call.Stream);
 			
 			Logger.Info($"Received asset index with {Index.Assets.Length} assets.");

@@ -21,6 +21,8 @@ public sealed class ClientPartRoot : PartRoot
 
 	public void Clear()
 	{
+		Root.ClearChildren();
+		
 		_registry.Clear();
 		
 		AddQueue.Clear();

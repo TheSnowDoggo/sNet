@@ -1,7 +1,15 @@
-﻿namespace sNet.CScriptPro;
+﻿using System.Collections.Frozen;
+
+namespace sNet.CScriptPro;
 
 public class Part2d : Part
 {
+	public new static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>(Part.GlobalProperties)
+	{
+		{ "position", new GSProperty<Part2d, Vec2Obj>(p => p.Position, (p, v) => p.Position = v, TypeId.Vec2) },
+		{ "globalPosition", new GSProperty<Part2d, Vec2Obj>(p => p.GlobalPosition, (p, v) => p.GlobalPosition = v, TypeId.Vec2, serializable: false) },
+	}.ToFrozenDictionary();
+	
 	private Vec2Obj _position = Vector2.Zero;
 
 	public Vec2Obj Position
@@ -9,10 +17,13 @@ public class Part2d : Part
 		get => _position;
 		set
 		{
-			if (ObserveSet(ref _position, value, "position"))
+			if (_position == value)
 			{
-				UpdateGlobalPosition();
+				return;
 			}
+			
+			_position = value;
+			UpdateGlobalPosition();
 		}
 	}
 	
@@ -25,46 +36,7 @@ public class Part2d : Part
 	}
 
 	public override PartType PartType => PartType.Part2d;
-
-	protected override string[] Properties => [..base.Properties, "position", "globalPosition"];
-
-	public override Obj this[Obj key]
-	{
-		get => key.TypeId != TypeId.String ? Nil.Value : (string)key switch
-		{
-			"position" => Position,
-			"globalPosition" => GlobalPosition,
-			_ => base[key],	
-		};
-		set
-		{
-			if (key.TypeId != TypeId.String) return;
-
-			switch ((string)key)
-			{
-			case "position":
-				Position = (Vec2Obj)value.Expect(TypeId.Vec2);
-				break;
-			case "globalPosition":
-				GlobalPosition = (Vec2Obj)value.Expect(TypeId.Vec2);
-				break;
-			default:
-				base[key] = value;
-				break;
-			}
-		}
-	}
-
-	public override int Serialize(Stream stream)
-	{
-		return base.Serialize(stream) + stream.WriteVec2(Position);
-	}
-
-	public override void Deserialize(Stream stream)
-	{
-		base.Deserialize(stream);
-		Position = stream.ReadVec2();
-	}
+	public override IReadOnlyDictionary<string, IProperty> Properties => GlobalProperties;
 
 	protected override void ParentUpdate()
 	{
