@@ -15,7 +15,7 @@ public sealed class ImportStatement : Statement
 
 		string name = stream.Consume(CsrId.Identifier).Lexeme;
 
-		if (stream.EndOfStream())
+		if (stream.EndOfStream)
 		{
 			throw new ParserException(stream.Line, "Expected as or semicolon, ran out of tokens.");
 		}

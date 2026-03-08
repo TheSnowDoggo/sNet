@@ -12,7 +12,7 @@ public sealed class FunctionDefinition : Obj
 	{
 		var statements = new List<Statement>();
 
-		while (!stream.EndOfStream())
+		while (!stream.EndOfStream)
 		{
 			statements.Add(Statement.Parse(stream));
 		}
@@ -37,7 +37,7 @@ public sealed class FunctionDefinition : Obj
 		var argNames = new HashSet<string>();
 		var args = new List<Arg>();
 		
-		while (!stream.EndOfStream() && stream.Peek().Type != CsrId.CloseParen)
+		while (!stream.EndOfStream && stream.Peek().Type != CsrId.CloseParen)
 		{
 			var name = stream.Consume(CsrId.Identifier).Lexeme;
 

@@ -3,6 +3,9 @@ using System.Text;
 
 namespace sNet;
 
+/// <summary>
+/// Provides error and info logging utilities.
+/// </summary>
 public static class Logger
 {
 	private const string DirectoryName = "logs";
@@ -11,11 +14,24 @@ public static class Logger
 	private static FileStream _fileStream;
 	private static StreamWriter _streamWriter;
 	
+	/// <summary>
+	/// Gets or sets the current console output text writer.
+	/// </summary>
 	public static TextWriter Out { get; set; } = Console.Out;
 	
+	/// <summary>
+	/// Gets the last error message or null if no errors have been logged.
+	/// </summary>
 	public static string LastError { get; private set; }
+	
+	/// <summary>
+	/// Gets the last info message or null if no infos have been logged.
+	/// </summary>
 	public static string LastInfo { get; private set;}
 
+	/// <summary>
+	/// Initializes the internal log file.
+	/// </summary>
 	public static void Initialize()
 	{
 		if (Interlocked.CompareExchange(ref _isInitialized, 1, 0) != 0)
@@ -40,6 +56,9 @@ public static class Logger
 		}
 	}
 
+	/// <summary>
+	/// Closes the internal log file.
+	/// </summary>
 	public static void Close()
 	{
 		if (Interlocked.CompareExchange(ref _isInitialized, 0, 1) == 0)
@@ -52,6 +71,10 @@ public static class Logger
 		_streamWriter = null;
 	}
 	
+	/// <summary>
+	/// Logs an info message.
+	/// </summary>
+	/// <param name="message">The message content.</param>
 	public static void Info(string message)
 	{
 		Log($"[INFO] {message}");
@@ -59,6 +82,12 @@ public static class Logger
 		LastInfo = message;
 	}
 
+	/// <summary>
+	/// Logs an error message.
+	/// </summary>
+	/// <param name="message">The message content.</param>
+	/// <param name="memberName">The caller member name.</param>
+	/// <param name="filePath">The caller file path.</param>
 	public static void Error(string message, [CallerMemberName] string memberName = "", [CallerFilePath] string filePath = "")
 	{
 		Log($"[ERROR] {Path.GetFileNameWithoutExtension(filePath)}.{memberName}(), {message}");

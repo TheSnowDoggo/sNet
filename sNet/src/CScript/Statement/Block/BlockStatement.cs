@@ -16,7 +16,7 @@ public class BlockStatement : Statement
 		
 		var statements = new List<Statement>();
 		
-		while (!stream.EndOfStream() && stream.Peek().Type != CsrId.CloseBrace)
+		while (!stream.EndOfStream && stream.Peek().Type != CsrId.CloseBrace)
 		{
 			statements.Add(Statement.Parse(stream));
 		}

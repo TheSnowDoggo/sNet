@@ -17,7 +17,7 @@ public sealed class TableDefinition : Obj
 	{
 		var items = new List<Pair>();
 		
-		while (!stream.EndOfStream() && stream.Peek().Type != CsrId.CloseBrace)
+		while (!stream.EndOfStream && stream.Peek().Type != CsrId.CloseBrace)
 		{
 			List<CsrToken> keyExpr;
 			List<CsrToken> valExpr;
@@ -59,7 +59,7 @@ public sealed class TableDefinition : Obj
 
 			items.Add(new Pair(keyExpr, valExpr));
 
-			if (stream.EndOfStream())
+			if (stream.EndOfStream)
 			{
 				throw new ParserException(stream.Line, "Expected comma or end brace, got nothing.");
 			}

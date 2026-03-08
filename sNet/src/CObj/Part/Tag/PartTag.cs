@@ -30,7 +30,7 @@ public sealed class PartTag
         
         stream.Consume(PartId.OpenBrace);
 
-        while (!stream.EndOfStream() && stream.Peek().Type != PartId.CloseBrace)
+        while (!stream.EndOfStream && stream.Peek().Type != PartId.CloseBrace)
         {
             var head = stream.Peek();
             
@@ -72,7 +72,7 @@ public sealed class PartTag
     {
         var tags = new List<PartTag>();
 
-        while (!stream.EndOfStream())
+        while (!stream.EndOfStream)
         {
             tags.Add(Parse(stream));
         }

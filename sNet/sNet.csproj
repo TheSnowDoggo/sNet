@@ -5,6 +5,7 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>sNet</Title>
         <Description>sNet Shared Library for Server and Client</Description>
@@ -17,6 +18,10 @@
         <FileVersion>0.0.0.0</FileVersion>
         <NeutralLanguage>en</NeutralLanguage>
         <Version>0.0.0</Version>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <NoWarn>1701;1702;1705;1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

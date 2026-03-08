@@ -59,7 +59,7 @@ public sealed class RpnParser
 		_opStack = [];
 		_level = 0;
 
-		while (!_stream.EndOfStream() && (_level > 0 || !end.Contains(_stream.Peek().Type)))
+		while (!_stream.EndOfStream && (_level > 0 || !end.Contains(_stream.Peek().Type)))
 		{
 			var token = _stream.Read();
 
@@ -102,7 +102,7 @@ public sealed class RpnParser
 				ParseCast(token);
 				break;
 			default:
-				if ((_stream.Current == 0 || Precedence.ContainsKey(_stream.LastLast().Type) && !_stream.LastLast().IsCompound()) &&
+				if ((_stream.Current == 0 || Precedence.ContainsKey(_stream.Last(2).Type) && !_stream.Last(2).IsCompound()) &&
 				    UnaryMap.TryGetValue(token.Type, out var unaryType))
 				{
 					token.Type = unaryType;
@@ -131,7 +131,7 @@ public sealed class RpnParser
 
 	private void ParseImplicit(int line)
 	{
-		if (_stream.EndOfStream())
+		if (_stream.EndOfStream)
 		{
 			return;
 		}
@@ -299,7 +299,7 @@ public sealed class RpnParser
 	{
 		stream.Consume(CsrId.OpenParen);
 
-		if (stream.EndOfStream())
+		if (stream.EndOfStream)
 		{
 			throw new ParserException(stream.Line, "Expected close bracket at end of argument list, got nothing.");
 		}
@@ -312,7 +312,7 @@ public sealed class RpnParser
 		int level = 0;
 		int args = 1;
 
-		while (!stream.EndOfStream())
+		while (!stream.EndOfStream)
 		{
 			var token = stream.Read();
 

@@ -12,11 +12,11 @@ public sealed class ArrayDef : Obj
 
 		var parser = new RpnParser(stream);
 
-		while (!stream.EndOfStream() && stream.Peek().Type != CsrId.CloseSquare)
+		while (!stream.EndOfStream && stream.Peek().Type != CsrId.CloseSquare)
 		{
 			expressions.Add(parser.Parse(CsrId.Comma, CsrId.CloseSquare));
 
-			if (stream.EndOfStream())
+			if (stream.EndOfStream)
 			{
 				throw new ParserException(stream.Line, "Expected comma or close bracket, ran out of tokens.");
 			}

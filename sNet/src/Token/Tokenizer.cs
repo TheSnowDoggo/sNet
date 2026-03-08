@@ -2,6 +2,11 @@
 
 namespace sNet.CScriptPro;
 
+/// <summary>
+/// Represents a base class for language tokenizers.
+/// </summary>
+/// <typeparam name="Id">The token id type.</typeparam>
+/// <typeparam name="TokenType">The token type.</typeparam>
 public abstract class Tokenizer<Id, TokenType>
 	where Id : struct
 	where TokenType : Token<Id>
@@ -10,24 +15,64 @@ public abstract class Tokenizer<Id, TokenType>
 	private int _line;
 	private char _current;
 
-	public Tokenizer(TextReader reader)
+	/// <summary>
+	/// Initializes a new instance of the <see cref="Tokenizer{Id, TokenType}"/> class, using the specified text reader.
+	/// </summary>
+	/// <param name="reader"></param>
+	protected Tokenizer(TextReader reader)
 	{
 		_reader = reader;
 	}
 	
+	/// <summary>
+	/// Gets a dictionary containing 2-character operators or null if none are defined.
+	/// </summary>
 	protected virtual IReadOnlyDictionary<string, Id> DoubleMap => null;
+	
+	/// <summary>
+	/// Gets a dictionay containing 1-character operators or null if none are defined.
+	/// </summary>
 	protected virtual IReadOnlyDictionary<char, Id> SingleMap => null;
 
+	/// <summary>
+	/// Gets a set containing operators which support compound assignment or null if none are defined.
+	/// </summary>
 	protected virtual IReadOnlySet<Id> CompoundSet => null;
 	
+	/// <summary>
+	/// Gets a dictionary containing all the alpha-numeric literals or null if none are defined.
+	/// </summary>
 	protected virtual IReadOnlyDictionary<string, Obj> LiteralMap => null;
+	
+	/// <summary>
+	/// Gets a dictionary containing all the keywords or null if none are defined.
+	/// </summary>
 	protected virtual IReadOnlyDictionary<string, Id> KeywordsMap => null;
 
+	/// <summary>
+	/// Gets the token id used used for identifiers.
+	/// </summary>
 	protected virtual Id IdentifierId => default;
+	
+	/// <summary>
+	/// Gets the token id used for literals.
+	/// </summary>
 	protected virtual Id LiteralId => default;
 
+	/// <summary>
+	/// Returns a new <typeparamref name="TokenType"/> instance.
+	/// </summary>
+	/// <param name="line">The current line number.</param>
+	/// <param name="id">The token id.</param>
+	/// <param name="lexeme">The source text of the token.</param>
+	/// <param name="value">The token value or null if no value is specified.</param>
+	/// <returns></returns>
 	protected abstract TokenType Create(int line, Id id, string lexeme, Obj value = null);
 
+	/// <summary>
+	/// Converts all the characters in the tokenizers text reader into tokens.
+	/// </summary>
+	/// <returns>A list containing the resulting tokens.</returns>
 	public List<TokenType> Tokenize()
 	{
 		var tokens = new List<TokenType>();

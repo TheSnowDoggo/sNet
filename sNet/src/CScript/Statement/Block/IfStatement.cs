@@ -17,7 +17,7 @@ public sealed class IfStatement : BlockStatement
 
 		var statements = BlockStatement.Parse(stream).Statements;
 
-		if (stream.EndOfStream() || stream.Peek().Type != CsrId.Else)
+		if (stream.EndOfStream || stream.Peek().Type != CsrId.Else)
 		{
 			return new IfStatement(line)
 			{
@@ -28,7 +28,7 @@ public sealed class IfStatement : BlockStatement
 
 		stream.Read();
 
-		if (stream.EndOfStream())
+		if (stream.EndOfStream)
 		{
 			throw new ParserException(stream.Line, "Expected block or if proceeding else keyword, got nothing.");
 		}
