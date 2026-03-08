@@ -97,6 +97,11 @@ public class NetSerializer : IDisposable
 		WrittenBytes += _stream.WriteArray(value);
 	}
 
+	public void WriteArgs(Obj[] args)
+	{
+		WrittenBytes += _stream.WriteArgs(args);
+	}
+
 	public void WriteTable(UserTable value)
 	{
 		WrittenBytes += _stream.WriteTable(value);

@@ -8,7 +8,7 @@ public sealed class ImageLoader
 {
 	private readonly Dictionary<string, Image> _images = [];
 	
-	public static ImageLoader Default { get; } = new ImageLoader();
+	public static ImageLoader Default { get; set; } = new ImageLoader();
 
 	public bool TryGet(string source, out Image image)
 	{

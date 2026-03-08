@@ -5,4 +5,6 @@ public enum PartSid : byte
     Add,
     Remove,
     Update,
+    FireServer,
+    FireClient,
 }

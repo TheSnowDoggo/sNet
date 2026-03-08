@@ -3,6 +3,7 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text.Unicode;
+using SCENeo.Serialization;
 using sNet.CScriptPro;
 
 namespace sNet;
@@ -119,7 +120,7 @@ public static class SerialExtensions
 
 		return 2 * sizeof(int) + written;
 	}
-
+	
 	public static int WriteNetUtf16(this Stream stream, string value)
 	{
 		if (stream.Position + value.Length * sizeof(char) > stream.Length)
@@ -169,6 +170,18 @@ public static class SerialExtensions
 		int written = sizeof(int);
 
 		foreach (var item in arrayObj)
+		{
+			written += stream.WriteObj(item);
+		}
+		
+		return written;
+	}
+
+	public static int WriteArgs(this Stream stream, Obj[] args)
+	{
+		int written = stream.WriteNetInt32(args.Length);
+
+		foreach (var item in args)
 		{
 			written += stream.WriteObj(item);
 		}
@@ -375,6 +388,25 @@ public static class SerialExtensions
 		}
 
 		return new ArrayObj(list);
+	}
+
+	public static Obj[] ReadArgs(this Stream stream)
+	{
+		int count = stream.ReadNetInt32();
+
+		if (count < 0)
+		{
+			throw new InvalidDataException($"Arg count (\'{count}\') was negative.");
+		}
+		
+		var args = new Obj[count];
+
+		for (int i = 0; i < count; i++)
+		{
+			args[i] = stream.ReadObj();
+		}
+
+		return args;
 	}
 
 	public static UserTable ReadTable(this Stream stream)

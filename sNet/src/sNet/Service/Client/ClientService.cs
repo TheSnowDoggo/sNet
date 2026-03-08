@@ -14,6 +14,12 @@ public abstract class ClientService : ServiceBase
 	{
 	}
 	
+	protected async Task<bool> SendPackAsync(byte sid, INetPackage data)
+	{
+		if (data.IsEmpty) return false;
+		return await Client.SendAsync(Format, (sid, (INetSerializable)data));
+	}
+	
 	protected async Task<bool> SendAsync<T>(byte sid, T data)
 		where T : INetSerializable
 	{

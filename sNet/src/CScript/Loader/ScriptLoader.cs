@@ -6,7 +6,7 @@ public sealed class ScriptLoader
 {
 	private readonly Dictionary<string, FunctionDefinition> _scripts = [];
 	
-	public static ScriptLoader Default { get; } = new ScriptLoader();
+	public static ScriptLoader Default { get; set; } = new ScriptLoader();
 
 	public bool TryGet(string source, out FunctionDefinition definition)
 	{

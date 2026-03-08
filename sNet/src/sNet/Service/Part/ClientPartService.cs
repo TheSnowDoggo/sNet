@@ -23,12 +23,20 @@ public class ClientPartService : ClientService
 		case PartSid.Update:
 			HandleUpdate(call);
 			break;
+		case PartSid.FireClient:
+			HandleFireClient(call);
+			break;
 		default:
 			Logger.Error($"Unrecognised part sid: {sid}");
 			break;
 		}
 	}
-
+	
+	public async Task<bool> SendEvent(EventPack events)
+	{
+		return await SendPackAsync((byte)PartSid.FireServer, events);
+	}
+	
 	private void HandleAdd(NetCall call)
 	{
 		try
@@ -39,7 +47,7 @@ public class ClientPartService : ClientService
 				return;
 			}
 
-			var queue = AddNetPack.Deserialize(call.Stream);
+			var queue = AddPack.Deserialize(call.Stream);
 			
 			Logger.Info($"Received add package with {queue.Count} queued.");
 
@@ -64,7 +72,7 @@ public class ClientPartService : ClientService
 				return;
 			}
 
-			var queue = RemoveNetPack.Deserialize(call.Stream);
+			var queue = RemovePack.Deserialize(call.Stream);
 
 			while (queue.TryDequeue(out var removeEvent))
 			{
@@ -87,7 +95,7 @@ public class ClientPartService : ClientService
 				return;
 			}
 
-			var queue = UpdateNetPack.Deserialize(call.Stream);
+			var queue = UpdatePack.Deserialize(call.Stream);
 
 			while (queue.TryDequeue(out var info))
 			{
@@ -98,5 +106,16 @@ public class ClientPartService : ClientService
 		{
 			Logger.Error(ex.Message);
 		}
+	}
+
+	private void HandleFireClient(NetCall call)
+	{
+		if (Root == null)
+		{
+			Logger.Error("Failed to handle event: No root assigned.");
+			return;
+		}
+        
+		Root.QueueEvents(call.Stream);
 	}
 }

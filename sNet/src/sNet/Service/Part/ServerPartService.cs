@@ -9,9 +9,24 @@ public sealed class ServerPartService : ServerService
     
     public override ServiceId ServiceId => ServiceId.Part;
 
+    public override void Receive(ServerNetCall call)
+    {
+        var sid = (PartSid)call.Stream.ReadExactByte();
+
+        switch (sid)
+        {
+        case PartSid.FireServer:
+            HandleFireServer(call);
+            break;
+        default:
+            Logger.Error($"Unrecognised part sid: {sid}.");
+            break;
+        }
+    }
+
     public override void ClientJoined(RemoteClient client)
     {
-        var add = new AddNetPack();
+        var add = new AddPack();
 
         foreach (var child in Root.Root.Children)
         {
@@ -23,18 +38,34 @@ public sealed class ServerPartService : ServerService
         Logger.Info($"Sending add package to {client}.");
     }
 
-    public async Task<bool> BroadcastAdd(AddNetPack add)
+    public async Task<bool> BroadcastAdd(AddPack add)
     {
         return await BroadcastPackAsync((byte)PartSid.Add, add);
     }
     
-    public async Task<bool> BroadcastRemove(RemoveNetPack remove)
+    public async Task<bool> BroadcastRemove(RemovePack remove)
     {
         return await BroadcastPackAsync((byte)PartSid.Remove, remove);
     }
     
-    public async Task<bool> BroadcastUpdate(UpdateNetPack update)
+    public async Task<bool> BroadcastUpdate(UpdatePack update)
     {
         return await BroadcastPackAsync((byte)PartSid.Update, update);
+    }
+
+    public async Task<bool> BroadcastEvent(EventPack events)
+    {
+        return await BroadcastPackAsync((byte)PartSid.FireClient, events);
+    }
+
+    private void HandleFireServer(ServerNetCall call)
+    {
+        if (Root == null)
+        {
+            Logger.Error("Failed to handle event: No root assigned.");
+            return;
+        }
+        
+        Root.QueueEvents(call.Stream, call.Client.Idx);
     }
 }
