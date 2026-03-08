@@ -58,6 +58,11 @@ public sealed class ServerPartService : ServerService
         return await BroadcastPackAsync((byte)PartSid.FireClient, events);
     }
 
+    public async Task<bool> SendEvent(int idx, EventPack events)
+    {
+        return await SendPackAsync(idx, (byte)PartSid.FireClient, events);
+    }
+
     private void HandleFireServer(ServerNetCall call)
     {
         if (Root == null)
