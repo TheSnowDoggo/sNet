@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="SCENeo">
+        <HintPath>..\sNet\bin\Debug\net9.0\SCENeo.dll</HintPath>
+      </Reference>
+      <Reference Include="SCEWin">
+        <HintPath>lib\SCEWin.dll</HintPath>
+      </Reference>
+      <Reference Include="sNet">
+        <HintPath>..\sNet\bin\Debug\net9.0\sNet.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="img\pause.binimg" />
+      <Content Include="img\pause.binimg">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\snet.binimg" />
+      <Content Include="img\snet.binimg">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+</Project>
