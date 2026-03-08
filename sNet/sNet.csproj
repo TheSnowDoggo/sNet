@@ -5,6 +5,11 @@
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>sNet</Title>
+        <Description>sNet Shared Library for Server and Client</Description>
+        <RepositoryUrl>https://github.com/TheSnowDoggo/sNet</RepositoryUrl>
+        <PackageReleaseNotes>Intial release</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
