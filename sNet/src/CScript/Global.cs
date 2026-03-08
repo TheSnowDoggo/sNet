@@ -12,6 +12,7 @@ public static class Global
         { "Part", Part.Export },
         { "Uid", UidObj.Export },
         { "Event", Event.Export },
+        { "Rand", Rand.Export },
         { "Key", new EnumTable<Key>() },
         { "Color", new EnumTable<SCEColor>() },
     }.ToFrozenDictionary();

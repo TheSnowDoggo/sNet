@@ -20,4 +20,14 @@ public static class Extensions
 	{
 		return Enum.TryParse(s, out TEnum value) ? value : defaultValue;
 	}
+
+	public static double NextDouble(this Random random, double max)
+	{
+		return double.Lerp(0, max, random.NextDouble());
+	}
+	
+	public static double NextDouble(this Random random, double min, double max)
+	{
+		return double.Lerp(min, max, random.NextDouble());
+	}
 }
