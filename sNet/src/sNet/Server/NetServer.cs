@@ -49,8 +49,12 @@ public sealed class NetServer
 		Services = new ServerServiceStore(this);
 	}
 
-	public int Port { get; set; } = 17324;
-	public int Backlog { get; set; } = 10;
+	public static NetServer FromConfig(ServerConfig config) => new NetServer(config.MaxClients)
+	{
+		Config = config,
+	};
+
+	public ServerConfig Config { get; init; } = new ServerConfig();
 	public int MaxReceiveSize { get; init; } = int.MaxValue;
 
 	public event Action<RemoteClient> ClientJoined;
@@ -67,7 +71,7 @@ public sealed class NetServer
 	{
 		try
 		{
-			var endPoint = new IPEndPoint(IPAddress.Any, Port);
+			var endPoint = new IPEndPoint(IPAddress.Any, Config.Port);
 
 			_socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
@@ -93,7 +97,7 @@ public sealed class NetServer
 		
 		try
 		{
-			_socket.Listen(Backlog);
+			_socket.Listen(Config.MaxClientBacklog);
 			
 			_processThread = new Thread(Process);
 			_processThread.Start();
