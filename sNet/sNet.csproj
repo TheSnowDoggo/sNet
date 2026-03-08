@@ -9,13 +9,7 @@
 
     <ItemGroup>
       <None Remove="scripts\script.csrp" />
-      <Content Include="scripts\script.csrp">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
       <None Remove="scripts\base.part" />
-      <Content Include="scripts\base.part">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
     </ItemGroup>
 
     <ItemGroup>

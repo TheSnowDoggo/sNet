@@ -212,7 +212,12 @@ public sealed class NetServer
 	{
 		try
 		{
-			_socket.Close();
+			foreach (var idx in Clients.ActiveClients)
+			{
+				_quitQueue.Enqueue(idx);
+			}
+			
+			_socket.Close(100);
 			_socket = null;
 
 			if (Interlocked.CompareExchange(ref _isActive, 0, 1) == 0)

@@ -13,10 +13,10 @@ public sealed class UserStore
 		Filepath = filepath;
 	}
 	
-	public readonly Dictionary<string, User> Users = [];
+	public Dictionary<string, User> Users { get; set; } = [];
 	
 	[JsonIgnore]
-	public string Filepath { get; }
+	public string Filepath { get; set; }
 	
 	[JsonIgnore]
 	public static UserStore Current { get; set; }
@@ -35,10 +35,11 @@ public sealed class UserStore
 			}
 
 			using var fs = File.OpenRead(filepath);
-			userStore = JsonSerializer.Deserialize<UserStore>(fs, UserStoreContext.Default.UserStore);
+			userStore = JsonSerializer.Deserialize(fs, UserStoreContext.Default.UserStore);
 
 			if (userStore != null)
 			{
+				userStore.Filepath = filepath;
 				return true;
 			}
 			
@@ -78,7 +79,7 @@ public sealed class UserStore
 		}
 		catch (Exception ex)
 		{
-			Logger.Error($"Failed to save tp {Filepath}: {ex.Message}");
+			Logger.Error($"Failed to save to {Filepath}: {ex.Message}");
 			return false;
 		}
 	}

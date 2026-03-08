@@ -4,6 +4,8 @@ public sealed class ClientCmdService : ClientService
 {
 	private const int MaxSendSize = 512;
 
+	public event Action<string> ResponseReceived;
+	
 	public override ServiceId ServiceId => ServiceId.Cmd;
 
 	public override void Receive(NetCall call)
@@ -38,10 +40,17 @@ public sealed class ClientCmdService : ClientService
 		return await SendAsync((byte)CmdSid.RequestRun, new SerialString(input));
 	}
 
+	public void FireCmd(string input)
+	{
+		Task.Run(() => SendCmdAsync(input));
+	}
+
 	private void HandleResponse(NetCall call)
 	{
 		var response = call.Stream.ReadNetUtf8();
 		
 		Logger.Info($"Response: {response}");
+		
+		ResponseReceived?.Invoke(response);
 	}
 }

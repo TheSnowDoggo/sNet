@@ -16,7 +16,7 @@ public sealed class ServerConfig
 	public int MaxClientBacklog { get; set; } = 10;
 	
 	[JsonIgnore]
-	public string Filepath { get; }
+	public string Filepath { get; set; }
 
 	public static bool TryLoadOrCreate(string filepath, [NotNullWhen(true)] out ServerConfig config)
 	{
@@ -30,10 +30,11 @@ public sealed class ServerConfig
 			}
 			
 			using var fs = File.OpenRead(filepath);
-			config = JsonSerializer.Deserialize<ServerConfig>(fs, ServerConfigContext.Default.ServerConfig);
+			config = JsonSerializer.Deserialize(fs, ServerConfigContext.Default.ServerConfig);
 
 			if (config != null)
 			{
+				config.Filepath = filepath;
 				return true;
 			}
 			

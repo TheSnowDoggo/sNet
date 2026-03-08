@@ -45,14 +45,9 @@ public sealed class ClientStore : IReadOnlyList<RemoteClient>
 			throw new InvalidOperationException($"Maximum number of clients {MaxClients} exceeded");
 		}
 
-		if (_clientData[client.Idx] != null)
-		{
-			throw new InvalidOperationException($"Client {client} has already been added or was not cleared properly.");
-		}
-
 		int idx = ResolveNextIdx();
 		_clientData[idx] = client;
-		_activeClients.Add(client.Idx);
+		_activeClients.Add(idx);
 		client.Idx = idx;
 
 		Count++;
@@ -76,6 +71,7 @@ public sealed class ClientStore : IReadOnlyList<RemoteClient>
 		}
 		
 		var client = _clientData[idx];
+		
 		client.Idx = -1;
 		
 		_clientData[idx] = null;

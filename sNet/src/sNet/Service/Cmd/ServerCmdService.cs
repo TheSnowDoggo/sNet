@@ -82,6 +82,9 @@ public sealed class ServerCmdService : ServerService
 	private bool ShutdownCmd(string[] args, RemoteClient client)
 	{
 		Server.Shutdown();
+
+		_ = new Timer(_ => Environment.Exit(0), null, TimeSpan.FromSeconds(3), Timeout.InfiniteTimeSpan);
+		
 		return true;
 	}
 
@@ -124,7 +127,7 @@ public sealed class ServerCmdService : ServerService
 		}
 		
 		client.Grant(user.Permissions);
-		Logger.Info($"Login successfull, permissions {user.Permissions} granted.");
+		Logger.Info($"{client} login successful, permissions {user.Permissions} granted.");
 		
 		return true;
 	}

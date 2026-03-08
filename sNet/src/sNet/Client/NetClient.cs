@@ -6,7 +6,10 @@ namespace sNet.Client;
 
 public sealed class NetClient
 {
-	private Socket  _socket;
+	private readonly ManualResetEvent _receiveDone = new ManualResetEvent(false);
+	private Thread _thread;
+	
+	private Socket _socket;
 	private NetCall _call;
 
 	public NetClient()
@@ -76,6 +79,8 @@ public sealed class NetClient
 			await _socket.DisconnectAsync(false);
 			_socket.Close();
 			_socket = null;
+
+			_receiveDone.Set();
 			
 			return true;
 		}
@@ -85,7 +90,7 @@ public sealed class NetClient
 			return false;
 		}
 	}
-
+	
 	public bool Start()
 	{
 		if (!Connected)
@@ -96,7 +101,8 @@ public sealed class NetClient
 		
 		try
 		{
-			Task.Run(Run);
+			_thread = new Thread(Run);
+			_thread.Start();
 			
 			return true;
 		}
@@ -140,13 +146,17 @@ public sealed class NetClient
 		}
 	}
 
-	private async Task Run()
+	private void Run()
 	{
 		using var buffer = RentBuffer.Share(Constants.BufferSize);
 		
 		while (Connected)
 		{
-			await ReceiveAsync(buffer);
+			_receiveDone.Reset();
+			
+			new TaskFactory().StartNew(ReceiveAsync, buffer);
+			
+			_receiveDone.WaitOne();
 		}
 		
 		_call?.Dispose();
@@ -156,8 +166,10 @@ public sealed class NetClient
 		Disconnected?.Invoke();
 	}
 
-	private async Task ReceiveAsync(RentBuffer buffer)
+	private async Task ReceiveAsync(object state)
 	{
+		var buffer = (RentBuffer)state;
+
 		try
 		{
 			int received = await _socket.ReceiveAsync(buffer);
@@ -207,8 +219,12 @@ public sealed class NetClient
 			{
 				return;
 			}
-			
+
 			Logger.Error(ex.Message);
+		}
+		finally
+		{
+			_receiveDone.Set();
 		}
 	}
 	
