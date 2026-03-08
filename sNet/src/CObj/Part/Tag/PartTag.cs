@@ -89,9 +89,15 @@ public sealed class PartTag
     {
         var part = Part.Create(PartType);
 
-        foreach (var property in Properties)
+        foreach ((var name, Obj value) in Properties)
         {
-            part[property.Key] = property.Value;
+            if (!part.Properties.TryGetValue(name, out var property))
+            {
+                Logger.Error($"Part {part.PartType} does not contain a property named {name}.");
+                continue;
+            }
+
+            property[part] = value;
         }
 
         foreach (var child in Children)

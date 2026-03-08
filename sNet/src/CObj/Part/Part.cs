@@ -1,13 +1,18 @@
 ﻿using System.Collections.Frozen;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace sNet.CScriptPro;
 
 public class Part : Obj
 {
-	private readonly List<Part> _children = [];
-
+	public static readonly ReadOnlyTable Export = new Dictionary<Obj, Obj>()
+	{
+		{ "new", GlobalFunction.Create(New, TypeId.String) },
+		{ "load", GlobalFunction.Create(Load, TypeId.String) },
+	}.ToFrozenDictionary();
+	
 	public static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>()
 	{
 		{ "id", new GProperty<Part>(p => (StrObj)p.PartType.ToString()) },
@@ -22,12 +27,8 @@ public class Part : Obj
 		{ "findFirstChild", new GProperty<Part>(p => GlobalFunction.Create(args => p.FindFirstChild((StrObj)args[0]), TypeId.String)) },
 	}.ToFrozenDictionary();
 	
-	public static readonly ReadOnlyTable Export = new Dictionary<Obj, Obj>()
-	{
-		{ "new", GlobalFunction.Create(New, TypeId.String) },
-		{ "load", GlobalFunction.Create(Load, TypeId.String) },
-	}.ToFrozenDictionary();
-
+	private readonly List<Part> _children = [];
+	
 	public override TypeId TypeId => TypeId.Part;
 
 	public virtual PartType PartType => PartType.Part;
@@ -57,12 +58,19 @@ public class Part : Obj
 
 			var name = (string)key;
 
-			if (!Properties.TryGetValue(name, out IProperty property))
+			if (Properties.TryGetValue(name, out IProperty property))
 			{
-				return FindFirstChild(name);
+				return property[this];
 			}
 
-			return property[this];
+			var value = FindFirstChild(name);
+
+			if (value.TypeId != TypeId.Nil)
+			{
+				return value;
+			}
+			
+			throw new ArgumentException($"Property or child with name ('{name}') not found in {PartType}.");
 		}
 		set
 		{
@@ -75,7 +83,7 @@ public class Part : Obj
 
 			if (!Properties.TryGetValue(name, out IProperty property))
 			{
-				return;
+				throw new ArgumentException($"Property or child with name ('{name}') not found in {PartType}.");
 			}
 
 			if (!property.Serializable)
@@ -266,15 +274,13 @@ public class Part : Obj
 		return Create(partId);
 	}
 
-	private static Part Load(Obj[] args)
+	private static Obj Load(Obj[] args)
 	{
 		var filepath = (string)args[0];
 		
-		var tag = PartTag.Parse(filepath);
-
-		return tag.Create();
+		return PartLoader.Default.TryGet(filepath, out var tag) ? tag.Create() : Nil.Value;
 	}
-
+	
 	private IEnumerable<Part> DescendentsBreadth()
 	{
 		var queue = new Queue<Part>();
@@ -312,10 +318,15 @@ public class Part : Obj
 		sb.Append(' ', level * 2);
 		sb.AppendLine($"{PartType} {{");
 
-		foreach (var property in Properties)
+		foreach (var (name, property) in Properties)
 		{
+			if (!property.Serializable)
+			{
+				continue;
+			}
+			
 			sb.Append(' ', (level + 1) * 2);
-			sb.AppendLine($"{property.Key}: {property.Value[this]},");
+			sb.AppendLine($"{name}: {property[this]},");
 		}
 		
 		foreach (var child in _children)

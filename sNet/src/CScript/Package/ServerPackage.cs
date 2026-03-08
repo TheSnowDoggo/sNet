@@ -1,18 +1,29 @@
 ﻿using System.Collections.Frozen;
+using sNet.Server;
 
 namespace sNet.CScriptPro;
 
 public sealed class ServerPackage : Package
 {
-	public static readonly Event PlayerJoin = new Event();
-	public static readonly Event PlayerQuit = new Event();
+	private readonly ReadOnlyTable _export;
 	
-	public static readonly ReadOnlyTable Exports = new Dictionary<Obj, Obj>()
+	public readonly Event PlayerJoin = new Event();
+	public readonly Event PlayerQuit = new Event();
+
+	public ServerPackage(NetServer server)
 	{
-		{ "playerJoin", PlayerJoin },
-		{ "playerQuit", PlayerQuit },
-	}.ToFrozenDictionary();
+		Server = server;
+		
+		_export = new Dictionary<Obj, Obj>()
+		{
+			{ "playerJoin", PlayerJoin },
+			{ "playerQuit", PlayerQuit },
+			{ "players", new ArrayViewObj<Number>([..Server.Clients.ActiveClients]) },
+		}.ToFrozenDictionary();
+	}
+	
+	public NetServer Server { get; }
 
 	public override string Name => "Server";
-	public override Obj Export => Exports;
+	public override Obj Export => _export;
 }

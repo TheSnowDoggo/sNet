@@ -18,6 +18,7 @@ public sealed class Server
 	private Thread _updateThread;
 	
 	private NetServer _server;
+	private ServerPackage _serverPackage;
 	private readonly ServerPartRoot _root = new ServerPartRoot();
 	private readonly ServerPartService _partService = new ServerPartService();
 	private readonly ServerAssetService _assetService = new ServerAssetService();
@@ -36,8 +37,6 @@ public sealed class Server
 	
 	public bool Run()
 	{
-		PackageManager.Default.Packages.Add("Server", new ServerPackage());
-		
 		if (!ServerConfig.TryLoadOrCreate("server_config.json", out var config))
 		{
 			return false;
@@ -52,6 +51,9 @@ public sealed class Server
 		
 		_server.ClientJoined += Server_OnClientJoined;
 		_server.ClientLeft += Server_OnClientLeft;
+
+		_serverPackage = new ServerPackage(_server);
+		PackageManager.Default.Packages.Add("Server", _serverPackage);
 		
 		if (!_server.Bind())
 		{
@@ -105,14 +107,14 @@ public sealed class Server
 		return true;
 	}
 
-	private static void Server_OnClientJoined(RemoteClient client)
+	private void Server_OnClientJoined(RemoteClient client)
 	{
-		ServerPackage.PlayerJoin.Fire(client.Idx);
+		_serverPackage.PlayerJoin.Fire(client.Idx);
 	}
 	
-	private static void Server_OnClientLeft(RemoteClient client)
+	private void Server_OnClientLeft(RemoteClient client)
 	{
-		ServerPackage.PlayerQuit.Fire(client.Idx);
+		_serverPackage.PlayerQuit.Fire(client.Idx);
 	}
 
 	private void Update(double delta)
