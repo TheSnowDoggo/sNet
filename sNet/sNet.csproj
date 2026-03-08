@@ -10,12 +10,14 @@
         <Description>sNet Shared Library for Server and Client</Description>
         <RepositoryUrl>https://github.com/TheSnowDoggo/sNet</RepositoryUrl>
         <PackageReleaseNotes>Intial release</PackageReleaseNotes>
+        <Copyright>MIT License</Copyright>
+        <SignAssembly>true</SignAssembly>
+        <AssemblyOriginatorKeyFile>snkey.snk</AssemblyOriginatorKeyFile>
+        <AssemblyVersion>0.0.0</AssemblyVersion>
+        <FileVersion>0.0.0.0</FileVersion>
+        <NeutralLanguage>en</NeutralLanguage>
+        <Version>0.0.0</Version>
     </PropertyGroup>
-
-    <ItemGroup>
-      <None Remove="scripts\script.csrp" />
-      <None Remove="scripts\base.part" />
-    </ItemGroup>
 
     <ItemGroup>
       <Reference Include="SCENeo">
