@@ -139,7 +139,13 @@ public sealed class ClientAssetService : ClientService
 			
 			Logger.Info($"Received asset index with {Index.Assets.Length} assets.");
 
-			Task.Run(RequestAssetsAsync);
+			if (Index.Assets.Length != 0)
+			{
+				Task.Run(RequestAssetsAsync);
+				return;
+			}
+			
+			AssetReceived?.Invoke(-1);
 		}
 		catch (Exception ex)
 		{

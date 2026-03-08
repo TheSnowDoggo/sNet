@@ -15,7 +15,7 @@ public sealed class AssetIndex : INetPackage
 
 	public bool IsEmpty => false;
 
-	public int MaxSize => MaxIndexPathSize * Assets.Length;
+	public int MaxSize => sizeof(int) + MaxIndexPathSize * Assets.Length;
 
 	public static AssetIndex Discover(string directory)
 	{

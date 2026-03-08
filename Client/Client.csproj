@@ -20,12 +20,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="img\pause.binimg" />
-      <Content Include="img\pause.binimg">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
       <None Remove="img\snet.binimg" />
       <Content Include="img\snet.binimg">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <None Remove="img\pause.binimg" />
+      <Content Include="img\pause.binimg">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
