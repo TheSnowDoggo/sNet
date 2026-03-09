@@ -13,17 +13,20 @@ namespace sNetServer;
 public sealed class Server
 {
 	private const string ServerDirectory = "server";
+	private const string AssetDirectory = "assets";
+	private const string UsersFile = "users.json";
 	
 	private readonly Updater _updater;
 	private Thread _updateThread;
 	
+	private readonly ServerPartRoot _root = new();
+	private readonly ServerPartService _partService = new();
+	private readonly ServerAssetService _assetService = new();
+	private readonly ServerCmdService _cmdService = new();
+	
 	private NetServer _server;
 	private ServerPackage _serverPackage;
-	private readonly ServerPartRoot _root = new ServerPartRoot();
-	private readonly ServerPartService _partService = new ServerPartService();
-	private readonly ServerAssetService _assetService = new ServerAssetService();
-	private readonly ServerCmdService _cmdService = new ServerCmdService();
-
+	
 	public Server()
 	{
 		_updater = new Updater(Update)
@@ -67,16 +70,16 @@ public sealed class Server
 			return false;
 		}
 
-		if (!UserStore.TryLoadOrCreate("users.json", out var users))
+		if (!UserStore.TryLoadOrCreate(UsersFile, out var users))
 		{
 			return false;
 		}
 
 		UserStore.Current = users;
 
-		Directory.CreateDirectory("assets");
+		Directory.CreateDirectory(AssetDirectory);
 
-		if (!AssetIndex.TryDiscover("assets", out var index))
+		if (!AssetIndex.TryDiscover(AssetDirectory, out var index))
 		{
 			return false;
 		}
