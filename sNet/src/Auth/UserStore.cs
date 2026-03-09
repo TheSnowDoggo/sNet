@@ -28,6 +28,8 @@ public sealed class UserStore
 			if (!File.Exists(filepath))
 			{
 				userStore = new UserStore(filepath);
+
+				userStore.Create("admin", "password", Permission.Admin);
 				
 				Logger.Info($"Created user store at {filepath}");
 				

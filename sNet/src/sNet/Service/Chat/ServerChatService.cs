@@ -63,9 +63,9 @@ public sealed class ServerChatService : ServerService
 	{
 		try
 		{
-			string content = call.Stream.ReadNetUtf8();
+			var content = call.Stream.ReadNetUtf8();
 
-			string message = $"<{call.Client.Idx}> {content}";
+			var message = $"<{call.Client.Idx}> {content}";
 		
 			Logger.Info(message);
 

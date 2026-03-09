@@ -21,7 +21,11 @@ internal static class Program
 		}
 		finally
 		{
-			Directory.Delete("assets", true);
+			if (Directory.Exists("assets"))
+			{
+				Directory.Delete("assets", true);
+			}
+			
 			Logger.Close();
 		}
 	}

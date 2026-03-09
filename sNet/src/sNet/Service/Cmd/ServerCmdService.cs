@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using sNet.Auth;
 using sNet.Server;
+using sNet.Service.Chat;
 
 namespace sNet.Service.Cmd;
 
@@ -11,11 +12,13 @@ public sealed class ServerCmdService : ServerService
 
 	public ServerCmdService()
 	{
-		Cmds = new Dictionary<string, Cmd>()
+		Cmds = new Dictionary<string, Cmd>
 		{
 			{ "shutdown", Cmd.Create(ShutdownCmd, 0, Permission.Admin) },
 			{ "restart", Cmd.Create(RestartCmd, 0, Permission.Admin) },
 			{ "login", Cmd.Create(LoginCmd, 2, Permission.None, true) },
+			{ "chat", Cmd.Create(ChatCmd, 2, -1, Permission.None) },
+			{ "broadcast", Cmd.Create(BroadcastCmd, 1, -1, Permission.Admin) },
 		}.ToFrozenDictionary();
 	}
 
@@ -129,6 +132,48 @@ public sealed class ServerCmdService : ServerService
 		client.Grant(user.Permissions);
 		Logger.Info($"{client} login successful, permissions {user.Permissions} granted.");
 		
+		return true;
+	}
+
+	private bool ChatCmd(string[] args, RemoteClient client)
+	{
+		if (!Server.Services.TryGet<ServerChatService>(ServiceId.Chat, out var chatService))
+		{
+			Logger.Error("Chat Service is not available.");
+			return false;
+		}
+
+		if (!int.TryParse(args[1], out var idx))
+		{
+			Logger.Error($"Client idx (\'{args[1]}\') was invalid.");
+			return false;
+		}
+
+		if (!Server.Clients.HasClient(idx))
+		{
+			Logger.Error($"No client with idx {idx} found.");
+			return false;
+		}
+		
+		var message = string.Join(' ', args, 2, args.Length - 2);
+		
+		chatService.FireChat(idx, message);
+
+		return true;
+	}
+
+	private bool BroadcastCmd(string[] args, RemoteClient client)
+	{
+		if (!Server.Services.TryGet<ServerChatService>(ServiceId.Chat, out var chatService))
+		{
+			Logger.Error("Chat Service is not available.");
+			return false;
+		}
+		
+		var message = string.Join(' ', args, 1, args.Length - 1);
+		
+		chatService.FireBroadcast(message);
+
 		return true;
 	}
 }

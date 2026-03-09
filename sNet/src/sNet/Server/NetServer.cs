@@ -287,7 +287,7 @@ public sealed class NetServer
 			
 			try
 			{
-				string clientStr = client.ToString();
+				var clientStr = client.ToString();
 				
 				Services.ClientLeft(client);
 				ClientLeft?.Invoke(client);

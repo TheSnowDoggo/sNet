@@ -29,6 +29,24 @@ public sealed class ServerServiceStore : IReadOnlyCollection<ServerService>
 		return (T)_services[serviceId];
 	}
 
+	public bool TryGet(ServiceId id, out ServerService service)
+	{
+		return _services.TryGetValue(id, out service);
+	}
+
+	public bool TryGet<T>(ServiceId id, out T service)
+		where T : ServerService
+	{
+		if (_services.TryGetValue(id, out var serverService))
+		{
+			service = (T)serverService;
+			return true;
+		}
+		
+		service = null;
+		return false;
+	}
+
 	public void Add(ServerService service)
 	{
 		if (!_services.TryAdd(service.ServiceId, service))

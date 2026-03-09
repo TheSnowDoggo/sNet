@@ -125,11 +125,16 @@ public sealed class ConnectScene : Scene
 		
 		for (int i = 0; i < _textEntries.Length; i++)
 		{
-			var entry = new TextEntry();
+			var text = _defaultFieldValues[i] ?? string.Empty;
 			
+			var entry = new TextEntry
+			{
+				Text = text,
+				Index = text.Length,
+			};
+
 			entry.TextChanged += TextEntry_OnTextChanged;
 			entry.IndexChanged += TextEntry_OnIndexChanged;
-			entry.Text = _defaultFieldValues[i];
 			
 			_textEntries[i] = entry;
 			

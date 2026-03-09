@@ -71,7 +71,6 @@ public sealed class ClientStore : IReadOnlyList<RemoteClient>
 		}
 		
 		var client = _clientData[idx];
-		
 		client.Idx = -1;
 		
 		_clientData[idx] = null;
