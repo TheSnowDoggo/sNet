@@ -6,8 +6,6 @@ public class BlockStatement : Statement
 
 	public List<Statement> Statements { get; init; }
 
-	protected virtual bool CreateScope => true;
-
 	public new static BlockStatement Parse(CsrTokenStream stream)
 	{
 		int line = stream.Line;
@@ -33,10 +31,7 @@ public class BlockStatement : Statement
 	{
 		base.Run(context);
 
-		if (CreateScope)
-		{
-			context.CreateScope();
-		}
+		context.CreateScope();
 		
 		var returnValue = ReturnValue.None;
 		
@@ -50,10 +45,7 @@ public class BlockStatement : Statement
 			}
 		}
 
-		if (CreateScope)
-		{
-			context.CloseScope();
-		}
+		context.CloseScope();
 		
 		return returnValue;
 	}

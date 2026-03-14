@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Text;
 using SCENeo;
 using SCENeo.Input;
@@ -6,6 +7,12 @@ namespace sNet.CScriptPro;
 
 public sealed class PartTag
 {
+    private static readonly FrozenDictionary<string, PartFlag> FlagNames = new Dictionary<string, PartFlag>()
+    {
+        { "NO_AUTO", PartFlag.NoAuto },
+        { "ROOT", PartFlag.Root },
+    }.ToFrozenDictionary();
+    
     public PartTag(PartType partType)
     {
         PartType = partType;
@@ -14,9 +21,12 @@ public sealed class PartTag
     public PartType PartType { get; }
     public Dictionary<string, Obj> Properties { get; } = [];
     public List<PartTag> Children { get; } = [];
+    public PartFlag Flags { get; init; }
     
     public static PartTag Parse(PartStream stream)
     {
+        var flags = ParseFlags(stream);
+        
         stream.Consume(PartId.Bang);
         
         var partStr = stream.Consume(PartId.Identifier).Lexeme;
@@ -25,41 +35,14 @@ public sealed class PartTag
         {
             throw new ParserException(stream.Line, $"Unrecognised part id {partStr}.");
         }
-        
-        var tag = new PartTag(partId);
-        
-        stream.Consume(PartId.OpenBrace);
 
-        while (!stream.EndOfStream && stream.Peek().Type != PartId.CloseBrace)
+        var tag = new PartTag(partId)
         {
-            var head = stream.Peek();
-            
-            switch (head.Type)
-            {
-            case PartId.Identifier:
-                stream.Read();
-                
-                stream.Consume(PartId.Colon);
+            Flags = flags,
+        };
 
-                var value = ParseValue(stream);
-
-                if (!tag.Properties.TryAdd(head.Lexeme, value))
-                {
-                    throw new ParserException(stream.Line, $"Tag contains duplicate property name (\'{head.Lexeme}\').");
-                }
-
-                stream.Consume(PartId.Semicolon);
-                break;
-            case PartId.Bang:
-                tag.Children.Add(Parse(stream));
-                break;
-            default:
-                throw new ParserException(stream.Line, $"Expected start of child tag or property value, got {head.Type}.");
-            }
-        }
-
-        stream.Consume(PartId.CloseBrace);
-
+        tag.ReadSubProperties(stream);
+        
         return tag;
     }
     
@@ -83,6 +66,87 @@ public sealed class PartTag
     public static List<PartTag> ParseAll(string filepath)
     {
         return ParseAll(PartTokenizer.TokenizeFile(filepath));
+    }
+
+    private static PartFlag ParseFlags(PartStream stream)
+    {
+        var flags = PartFlag.None;
+        
+        while (!stream.EndOfStream && stream.Peek().Type == PartId.Dollar)
+        {
+            stream.Read();
+            
+            var name = stream.Consume(PartId.Identifier).Lexeme;
+
+            if (!FlagNames.TryGetValue(name, out var flag))
+            {
+                throw new ParserException(stream.Line, $"Unrecognised flag (\'{name}\').");
+            }
+            
+            flags |= flag;
+        }
+
+        return flags;
+    }
+
+    private void ReadSubProperties(PartStream stream, bool redefine = false)
+    {
+        stream.Consume(PartId.OpenBrace);
+        
+        while (!stream.EndOfStream && stream.Peek().Type != PartId.CloseBrace)
+        {
+            var head = stream.Peek();
+            
+            switch (head.Type)
+            {
+            case PartId.Identifier:
+                stream.Read();
+                
+                stream.Consume(PartId.Colon);
+
+                var value = ParseValue(stream);
+
+                if (redefine)
+                {
+                    Properties[head.Lexeme] = value;
+                    stream.Consume(PartId.Semicolon);
+                    break;
+                }
+                
+                if (!Properties.TryAdd(head.Lexeme, value))
+                {
+                    throw new ParserException(stream.Line, $"Tag contains duplicate property name (\'{head.Lexeme}\').");
+                }
+
+                stream.Consume(PartId.Semicolon);
+                break;
+            case PartId.Bang:
+                Children.Add(Parse(stream));
+                break;
+            case PartId.Percentage:
+                stream.Read();
+
+                var filepath = (string)stream.Consume(PartId.Literal).Value.Expect(TypeId.String);
+
+                var ext = Parse(filepath);
+
+                if (stream.Peek().Type == PartId.Semicolon)
+                {
+                    stream.Read();
+                }
+                else
+                {
+                    ext.ReadSubProperties(stream, true);
+                }
+                
+                Children.Add(ext);
+                break;
+            default:
+                throw new ParserException(stream.Line, $"Expected start of child tag or property value, got {head.Type}.");
+            }
+        }
+        
+        stream.Consume(PartId.CloseBrace);
     }
 
     public Part Create()

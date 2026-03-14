@@ -8,8 +8,6 @@ public sealed class ForStatement : BlockStatement
 	public List<CsrToken> Condition { get; init; }
 	public List<CsrToken> Increment{ get; init; }
 	
-	protected override bool CreateScope => false;
-
 	public new static ForStatement Parse(CsrTokenStream stream)
 	{
 		int line = stream.Peek().Line;

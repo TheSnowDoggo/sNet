@@ -144,20 +144,27 @@ public sealed class Server
 				continue;
 			}
 			
-			try
+			if (!PartLoader.Default.TryGet(file, out var rootTag))
 			{
-				var tags = PartTag.ParseAll(file);
-
-				foreach (var tag in tags)
-				{
-					_root.Root.AddChild(tag.Create());
-
-					parts++;
-				}
+				continue;
 			}
-			catch (Exception ex)
+
+			if (rootTag.Flags.HasFlag(PartFlag.NoAuto))
 			{
-				Logger.Error($"Failed to load parts from {file}: {ex.Message}");
+				continue;
+			}
+
+			if (!rootTag.Flags.HasFlag(PartFlag.Root))
+			{
+				_root.Root.AddChild(rootTag.Create());
+				parts++;
+				continue;
+			}
+			
+			foreach (var child in rootTag.Children)
+			{
+				_root.Root.AddChild(child.Create());
+				parts++;
 			}
 		}
 		

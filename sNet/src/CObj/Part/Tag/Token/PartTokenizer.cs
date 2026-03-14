@@ -11,6 +11,8 @@ public sealed class PartTokenizer : Tokenizer<PartId, PartToken>
         { ')', PartId.CloseParen },
         { '{', PartId.OpenBrace },
         { '}', PartId.CloseBrace },
+        { '$', PartId.Dollar },
+        { '%', PartId.Percentage },
         { ';', PartId.Semicolon },
         { ':', PartId.Colon },
         { ',', PartId.Comma },

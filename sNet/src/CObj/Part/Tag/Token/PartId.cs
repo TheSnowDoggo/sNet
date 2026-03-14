@@ -7,6 +7,8 @@ public enum PartId
     OpenBrace,
     CloseBrace,
     
+    Dollar,
+    Percentage,
     Semicolon,
     Colon,
     Comma,
