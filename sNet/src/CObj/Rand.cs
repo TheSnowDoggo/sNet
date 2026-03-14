@@ -39,7 +39,7 @@ public sealed class Rand : Obj
 	{
 		0 => _random.NextInt64(),
 		1 => _random.NextInt64((int)args[0]),
-		2 => _random.NextInt64((int)args[1], (int)args[2]),
+		2 => _random.NextInt64((int)args[0], (int)args[1]),
 		_ => throw new ArgumentOutOfRangeException(nameof(args), args, $"Expected 0, 1 or 2 arguments, got {args.Length}"),
 	};
 
