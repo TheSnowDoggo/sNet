@@ -106,7 +106,7 @@ public sealed class ServerCmdService : ServerService
 		var psi = new ProcessStartInfo()
 		{
 			FileName = filename,
-			UseShellExecute = true,
+			UseShellExecute = false,
 		};
 		
 		Process.Start(psi);
