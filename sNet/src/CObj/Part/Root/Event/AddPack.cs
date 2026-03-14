@@ -8,7 +8,7 @@ public sealed class AddPack : INetPackage
 
     public bool IsEmpty => _queue.Count == 0;
     
-    public int MaxSize => MaxAddSize;
+    public int MaxSize => MaxAddSize * _queue.Count;
 
     public void Enqueue(Part part)
     {

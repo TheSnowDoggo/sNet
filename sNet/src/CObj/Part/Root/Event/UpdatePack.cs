@@ -4,13 +4,11 @@ public sealed class UpdatePack : INetPackage
 {
 	public const int MaxUpdateSize = 4096;
 	
-	private readonly Lock _lock	= new Lock();
-	
 	private UidRegistry<Dictionary<string, Obj>> _data = [];
 	
 	public bool IsEmpty => _data.Count == 0;
 
-	public int MaxSize => MaxUpdateSize;
+	public int MaxSize => MaxUpdateSize * _data.Count;
 
 	public void Enqueue(Uid uid, string name, Obj obj)
 	{

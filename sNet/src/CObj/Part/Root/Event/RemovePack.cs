@@ -2,13 +2,11 @@
 
 public sealed class RemovePack : INetPackage
 {
-	public const int MaxRemoveSize = 1024;
-	
 	private HashSet<Uid> _removes = [];
 
 	public bool IsEmpty => _removes.Count == 0;
 
-	public int MaxSize => MaxRemoveSize;
+	public int MaxSize => sizeof(int) + _removes.Count * sizeof(long);
 
 	public bool Enqueue(Uid part)
 	{
