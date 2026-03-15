@@ -21,6 +21,11 @@ public abstract class PartRoot
 	
 	public readonly EventPack EventPack = new EventPack();
 
+	public Obj GetPartByUid(Uid uid)
+	{
+		return _registry.TryGetValue(uid, out var part) ? part : Nil.Value;
+	}
+	
 	public void QueueEvents(Stream stream, int clientIdx = -1)
 	{
 		try

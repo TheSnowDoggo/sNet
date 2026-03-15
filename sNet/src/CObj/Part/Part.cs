@@ -25,6 +25,7 @@ public class Part : Obj
 		{ "addChild", new GProperty<Part>(p => GlobalFunction.Create(args => p.AddChild((Part)args[0]), TypeId.Part)) },
 		{ "removeChild", new GProperty<Part>(p => GlobalFunction.Create(args => p.RemoveChild((Part)args[0]), TypeId.Part)) },
 		{ "findFirstChild", new GProperty<Part>(p => GlobalFunction.Create(args => p.FindFirstChild((StrObj)args[0]), TypeId.String)) },
+		{ "getByUid", new GProperty<Part>(p => GlobalFunction.Create(p.GetByUid, TypeId.Uid)) },
 	}.ToFrozenDictionary();
 	
 	private readonly List<Part> _children = [];
@@ -279,6 +280,16 @@ public class Part : Obj
 		var filepath = (string)args[0];
 		
 		return PartLoader.Default.TryGet(filepath, out var tag) ? tag.Create() : Nil.Value;
+	}
+
+	private Obj GetByUid(Obj[] args)
+	{
+		if (Root == null)
+		{
+			throw new InvalidOperationException("Cannot get part by uid as part is not rooted.");
+		}
+
+		return Root.GetPartByUid((UidObj)args[0]);
 	}
 	
 	private IEnumerable<Part> DescendentsBreadth()
