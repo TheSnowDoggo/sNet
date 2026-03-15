@@ -16,11 +16,11 @@ public sealed class ForStatement : BlockStatement
 
 		var define = DefineStatement.Parse(stream);
 
-		var condition = new RpnParser(stream).Parse(CsrId.Semicolon);
+		var condition = new RpnParser(stream).Parse([CsrId.Semicolon]);
 
 		stream.Consume(CsrId.Semicolon);
 
-		var increment = new RpnParser(stream).Parse(CsrId.OpenBrace);
+		var increment = new RpnParser(stream).Parse([CsrId.OpenBrace]);
 
 		var statements = BlockStatement.Parse(stream).Statements;
 

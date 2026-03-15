@@ -14,58 +14,19 @@ public sealed class RpnParser
 		_stream = stream;
 	}
 	
-	public List<CsrToken> Parse(params HashSet<CsrId> end)
+	public List<CsrToken> Parse(bool ignoreFirst, HashSet<CsrId> end)
 	{
 		_result = [];
 		_opStack = [];
 		_level = 0;
 
-		while (!_stream.EndOfStream && (_level > 0 || !end.Contains(_stream.Peek().Type)))
-		{
-			var token = _stream.Read();
+		var first = true;
 
-			switch (token.Type)
-			{
-			case CsrId.OpenParen:
-				_opStack.Push(token);
-				_level++;
-				break;
-			case CsrId.OpenSquare:
-				ParseArrayDefinition(token);
-				break;
-			case CsrId.OpenBrace:
-				ParseTableDefinition(token);
-				break;
-			case CsrId.CloseParen:
-				FlushBracket(CsrId.OpenParen);
-				ParseImplicit(token.Line);
-				_level--;
-				break;
-			case CsrId.CloseSquare:
-				FlushBracket(CsrId.OpenSquare);
-				ParseImplicit(token.Line);
-				_level--;
-				break;
-			case CsrId.Comma:
-				FlushComma();
-				break;
-			case CsrId.Literal:
-				_result.Add(token);
-				break;
-			case CsrId.Identifier:
-				_result.Add(token);
-				ParseImplicit(token.Line);
-				break;
-			case CsrId.Function:
-				ParseFunctionDefinition(token);
-				break;
-			case CsrId.Cast:
-				ParseCast(token);
-				break;
-			default:
-				LoadOperator(token);
-				break;
-			}
+		while (!_stream.EndOfStream && (ignoreFirst && first || _level > 0 || !end.Contains(_stream.Peek().Type)))
+		{
+			NextToken(_stream.Read());
+
+			first = false;
 		}
 
 		FlushAll();
@@ -77,6 +38,11 @@ public sealed class RpnParser
 
 		return result;
 	}
+	
+	public List<CsrToken> Parse(HashSet<CsrId> end)
+	{
+		return Parse(false, end);
+	}
 
 	private static bool IsOpen(CsrToken csrToken)
 	{
@@ -86,6 +52,52 @@ public sealed class RpnParser
 	private static bool IsOperator(CsrToken csrToken)
 	{
 		return CsrConfig.Precedence.ContainsKey(csrToken.Type);
+	}
+
+	private void NextToken(CsrToken token)
+	{
+		switch (token.Type)
+		{
+		case CsrId.OpenParen:
+			_opStack.Push(token);
+			_level++;
+			break;
+		case CsrId.OpenSquare:
+			ParseArrayDefinition(token);
+			break;
+		case CsrId.OpenBrace:
+			ParseTableDefinition(token);
+			break;
+		case CsrId.CloseParen:
+			FlushBracket(CsrId.OpenParen);
+			ParseImplicit(token.Line);
+			_level--;
+			break;
+		case CsrId.CloseSquare:
+			FlushBracket(CsrId.OpenSquare);
+			ParseImplicit(token.Line);
+			_level--;
+			break;
+		case CsrId.Comma:
+			FlushComma();
+			break;
+		case CsrId.Literal:
+			_result.Add(token);
+			break;
+		case CsrId.Identifier:
+			_result.Add(token);
+			ParseImplicit(token.Line);
+			break;
+		case CsrId.Function:
+			ParseFunctionDefinition(token);
+			break;
+		case CsrId.Cast:
+			ParseCast(token);
+			break;
+		default:
+			LoadOperator(token);
+			break;
+		}
 	}
 
 	private void ParseImplicit(int line)

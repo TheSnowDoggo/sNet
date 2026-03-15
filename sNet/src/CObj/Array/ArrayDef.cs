@@ -14,7 +14,7 @@ public sealed class ArrayDef : Obj
 
 		while (!stream.EndOfStream && stream.Peek().Type != CsrId.CloseSquare)
 		{
-			expressions.Add(parser.Parse(CsrId.Comma, CsrId.CloseSquare));
+			expressions.Add(parser.Parse([CsrId.Comma, CsrId.CloseSquare]));
 
 			if (stream.EndOfStream)
 			{

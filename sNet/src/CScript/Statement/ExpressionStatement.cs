@@ -10,7 +10,7 @@ public class ExpressionStatement : Statement
 	{
 		int line = stream.Peek().Line;
 		
-		var expr = new RpnParser(stream).Parse(CsrId.Semicolon);
+		var expr = new RpnParser(stream).Parse([CsrId.Semicolon]);
 		
 		stream.Consume(CsrId.Semicolon);
 

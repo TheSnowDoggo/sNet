@@ -19,20 +19,19 @@ public sealed class TableDefinition : Obj
 		
 		while (!stream.EndOfStream && stream.Peek().Type != CsrId.CloseBrace)
 		{
-			List<CsrToken> keyExpr;
-			List<CsrToken> valExpr;
+			List<CsrToken> keyExpr, valExpr;
 
 			var head = stream.Read();
 
 			switch (head.Type)
 			{
 			case CsrId.OpenSquare:
-				keyExpr = new RpnParser(stream).Parse(CsrId.CloseSquare);
+				keyExpr = new RpnParser(stream).Parse([CsrId.CloseSquare]);
 				
 				stream.Consume(CsrId.CloseSquare);
 				stream.Consume(CsrId.Assign);
 				
-				valExpr = new RpnParser(stream).Parse(CsrId.Comma, CsrId.CloseBrace);
+				valExpr = new RpnParser(stream).Parse([CsrId.Comma, CsrId.CloseBrace]);
 				break;
 			case CsrId.Identifier:
 				head.Type = CsrId.Literal;
@@ -42,7 +41,7 @@ public sealed class TableDefinition : Obj
 				
 				stream.Consume(CsrId.Assign);
 				
-				valExpr = new RpnParser(stream).Parse(CsrId.Comma, CsrId.CloseBrace);
+				valExpr = new RpnParser(stream).Parse([CsrId.Comma, CsrId.CloseBrace]);
 				break;
 			case CsrId.Function:
 				var name = stream.Consume(CsrId.Identifier);

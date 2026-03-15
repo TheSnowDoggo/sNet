@@ -13,7 +13,7 @@ public sealed class IfStatement : BlockStatement
 		
 		stream.Consume(CsrId.If);
 
-		var expr = new RpnParser(stream).Parse(CsrId.OpenBrace);
+		var expr = new RpnParser(stream).Parse([CsrId.OpenBrace]);
 
 		var statements = BlockStatement.Parse(stream).Statements;
 

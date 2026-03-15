@@ -27,7 +27,7 @@ public sealed class ForeachStatement : BlockStatement
 
 		stream.Consume(CsrId.In);
 
-		var expr = new RpnParser(stream).Parse(CsrId.OpenBrace);
+		var expr = new RpnParser(stream).Parse(true, [CsrId.OpenBrace]);
 
 		var statements = BlockStatement.Parse(stream).Statements;
 

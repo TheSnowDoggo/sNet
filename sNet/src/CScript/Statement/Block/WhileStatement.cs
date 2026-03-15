@@ -12,7 +12,7 @@ public sealed class WhileStatement : BlockStatement
 		
 		stream.Consume(CsrId.While);
 
-		var expr = new RpnParser(stream).Parse(CsrId.OpenBrace);
+		var expr = new RpnParser(stream).Parse([CsrId.OpenBrace]);
 
 		var statements = BlockStatement.Parse(stream).Statements;
 

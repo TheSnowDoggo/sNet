@@ -23,7 +23,7 @@ public sealed class DefineStatement : Statement
 
         stream.Consume(CsrId.Assign);
 
-        var expr = new RpnParser(stream).Parse(CsrId.Semicolon);
+        var expr = new RpnParser(stream).Parse([CsrId.Semicolon]);
         
         stream.Consume(CsrId.Semicolon);
 
