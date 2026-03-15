@@ -103,7 +103,7 @@ public sealed class Server
 			{
 				continue;
 			}
-
+			
 			_cmdService.TryRun(input);
 		}
 		
