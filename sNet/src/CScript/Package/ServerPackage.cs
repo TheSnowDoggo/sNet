@@ -18,7 +18,7 @@ public sealed class ServerPackage : Package
 		{
 			{ "playerJoin", PlayerJoin },
 			{ "playerQuit", PlayerQuit },
-			{ "players", new ArrayViewObj<Number>([..Server.Clients.ActiveClients]) },
+			{ "getPlayers", GlobalFunction.Create(GetPlayers) },
 		}.ToFrozenDictionary();
 	}
 	
@@ -26,4 +26,9 @@ public sealed class ServerPackage : Package
 
 	public override string Name => "Server";
 	public override ReadOnlyTable Export => _export;
+
+	private ArrayBaseObj GetPlayers(Obj[] args)
+	{
+		return new ArrayViewObj<Number>([..Server.Clients.ActiveClients]);
+	}
 }

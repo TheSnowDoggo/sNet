@@ -45,6 +45,8 @@ public sealed class Vec2Obj : Obj,
     public static Vector2 operator +(Vec2Obj a, Vec2Obj b) => a._value + b._value;
     public static Vector2 operator -(Vec2Obj a, Vec2Obj b) => a._value - b._value;
 
+    public static Vector2 operator -(Vec2Obj a) => -a._value;
+
     public override Obj this[Obj key] => key.TypeId != TypeId.String ? Nil.Value : (string)key switch
     {
         "x" => _value.X,

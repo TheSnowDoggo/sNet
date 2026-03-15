@@ -94,6 +94,19 @@ public sealed class Evaluator
         }.ToFrozenDictionary() },
     }.ToFrozenDictionary();
     
+    private static readonly FrozenDictionary<CsrId, FrozenDictionary<TypeId, Unary>> UnaryOperators = new Dictionary<CsrId, FrozenDictionary<TypeId, Unary>>()
+    {
+        { CsrId.Minus, new Dictionary<TypeId, Unary>()
+        {
+            { TypeId.Number, x => -(Number)x },
+            { TypeId.Vec2, x => -(Vec2Obj)x },
+        }.ToFrozenDictionary() },
+        { CsrId.Complement, new Dictionary<TypeId, Unary>()
+        {
+            { TypeId.Number, x => ~(Number)x },
+        }.ToFrozenDictionary() },
+    }.ToFrozenDictionary();
+    
     private readonly Context _context;
     private readonly List<CsrToken> _tokens;
     private Stack<Obj> _stack;
@@ -131,15 +144,15 @@ public sealed class Evaluator
         return value;
     }
 
-    private void NextToken(CsrToken csrToken)
+    private void NextToken(CsrToken token)
     {
-        switch (csrToken.Type)
+        switch (token.Type)
         {
         case CsrId.Literal:
-            _stack.Push(csrToken.Value.Clone());
+            _stack.Push(token.Value.Clone());
             break;
         case CsrId.Identifier:
-            _stack.Push(new VariableRefObj(csrToken.Lexeme, _context));
+            _stack.Push(new VariableRefObj(token.Lexeme, _context));
             break;
         case CsrId.Equals:
             EvalEquals();
@@ -150,32 +163,26 @@ public sealed class Evaluator
         case CsrId.Assign:
             EvalAssign();
             break;
-        case CsrId.Complement:
-            EvalComplement();
-            break;
         case CsrId.Not:
             EvalNot();
             break;
-        case CsrId.Minus:
-            EvalMinus();
-            break;
         case CsrId.Invoke:
-            EvalInvoke(csrToken);
+            EvalInvoke(token);
             break;
         case CsrId.Function:
-            EvalFunction(csrToken);
+            EvalFunction(token);
             break;
         case CsrId.ArrayDefinition:
-            EvalArrayDefintion(csrToken);
+            EvalArrayDefintion(token);
             break;
         case CsrId.TableDefinition:
-            EvalTableDefintion(csrToken);
+            EvalTableDefintion(token);
             break;
         case CsrId.Period:
-            EvalMemberRef(csrToken);
+            EvalMemberRef(token);
             break;
         case CsrId.Cast:
-            EvalCast(csrToken);
+            EvalCast(token);
             break;
         case CsrId.Typeof:
             EvalTypeof();
@@ -184,14 +191,7 @@ public sealed class Evaluator
             EvalDynamicCast();
             break;
         default:
-            if (csrToken.IsCompound())
-            {
-                EvalBinaryCompound(csrToken);
-            }
-            else
-            {
-                EvalBinary(csrToken);
-            }
+            EvalOperator(token);
             break;
         }
     }
@@ -255,27 +255,12 @@ public sealed class Evaluator
         cref.Value = right;
     }
 
-    private void EvalComplement()
-    {
-        PopUnaryDeref(out var value);
-        ThrowIfNot(value, TypeId.Number);
-        _stack.Push(~(Number)value);
-    }
-
     private void EvalNot()
     {
         PopUnaryDeref(out var value);
-        ThrowIfNot(value, TypeId.Bool);
-        _stack.Push(!(Bool)value);
+        _stack.Push(!value.AsBool());
     }
-
-    private void EvalMinus()
-    {
-        PopUnaryDeref(out var x);
-        ThrowIfNot(x, TypeId.Number);
-        _stack.Push(-(Number)x);
-    }
-
+    
     private void EvalInvoke(CsrToken csrToken)
     {
         int argCount = (int)(Number)csrToken.Value;
@@ -367,6 +352,35 @@ public sealed class Evaluator
         }
         
         _stack.Push(left.Cast(type));
+    }
+
+    private void EvalOperator(CsrToken op)
+    {
+        if (UnaryOperators.TryGetValue(op.Type, out var unarySet))
+        {
+            EvalUnary(op, unarySet);
+            return;
+        }
+        
+        if (op.IsCompound())
+        {
+            EvalBinaryCompound(op);
+            return;
+        }
+        
+        EvalBinary(op);
+    }
+
+    private void EvalUnary(CsrToken op, FrozenDictionary<TypeId, Unary> unarySet)
+    {
+        PopUnaryDeref(out var x);
+
+        if (!unarySet.TryGetValue(x.TypeId, out var unary))
+        {
+            throw new InterpreterException(_context.Line, $"Unary operator {op.Type} has no overload for type {x.TypeId}.");
+        }
+        
+        _stack.Push(unary.Invoke(x));
     }
 
     private void EvalBinary(CsrToken op)

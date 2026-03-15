@@ -93,7 +93,7 @@ public static class CsrConfig
 	{
 		{ CsrId.Invoke, 12 },
 		{ CsrId.Period, 12 },
-		{ CsrId.DynamicCast, 12 },
+		{ CsrId.DynamicCast, 11 },
 		{ CsrId.Complement, 11 },
 		{ CsrId.Not, 11 },
 		{ CsrId.Minus, 11 },
@@ -131,6 +131,7 @@ public static class CsrConfig
 		CsrId.Not,
 		CsrId.Minus,
 		CsrId.Cast,
+		CsrId.DynamicCast,
 		CsrId.Typeof,
 	}.ToFrozenSet();
 }

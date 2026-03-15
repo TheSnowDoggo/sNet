@@ -32,7 +32,7 @@ public abstract class Obj
 
 	public virtual bool AsBool()
 	{
-		return false;
+		return true;
 	}
 
 	public virtual Obj Cast(TypeId to)

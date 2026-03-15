@@ -40,6 +40,20 @@ public sealed class InputPackage : Package
 
 	private static Bool IsFocused(Obj[] args)
 	{
-		return Client.Instance.Scenes.InputFocus == null;
+		if (Client.Instance.Scenes.InputFocus != null)
+		{
+			return false;
+		}
+		
+		if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+		{
+			return true;
+		}
+
+#if DEBUG
+		return true;
+#else
+		return Input.InFocus();
+#endif
 	}
 }

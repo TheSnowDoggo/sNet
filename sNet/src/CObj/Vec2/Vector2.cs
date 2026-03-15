@@ -35,6 +35,8 @@ public struct Vector2 : IEquatable<Vector2>
     
     public static Vector2 operator +(Vector2 a, Vector2 b) => new Vector2(a.X + b.X, a.Y + b.Y);
     public static Vector2 operator -(Vector2 a, Vector2 b) => new Vector2(a.X - b.X, a.Y - b.Y);
+    
+    public static Vector2 operator -(Vector2 a) => new Vector2(-a.X, -a.Y);
 
     public readonly double LengthSquared()
     {

@@ -13,6 +13,11 @@ public sealed class Nil : Obj
 		return "nil";
 	}
 
+	public override bool AsBool()
+	{
+		return false;
+	}
+
 	public override Obj Clone()
 	{
 		return Value;
