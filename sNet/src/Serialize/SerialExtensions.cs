@@ -120,6 +120,11 @@ public static class SerialExtensions
 
 		return 2 * sizeof(int) + written;
 	}
+
+	public static int MaxUtf8ByteCount(this string s)
+	{
+		return 2 * sizeof(int) + s.Length;
+	}
 	
 	public static int WriteNetUtf16(this Stream stream, string value)
 	{
@@ -142,6 +147,11 @@ public static class SerialExtensions
 		}
 
 		return sizeof(int) + value.Length * sizeof(char);
+	}
+
+	public static int Utf16ByteCount(this string s)
+	{
+		return sizeof(int) + s.Length;
 	}
 	
 	public static int WriteObj(this Stream stream, Obj obj)

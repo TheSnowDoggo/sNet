@@ -4,7 +4,7 @@ public static class ChatService
 {
 	public static RentBuffer FormatMessage(string message)
 	{
-		int bytes = sizeof(int) + 2 * sizeof(byte) + 2 * sizeof(int) + message.Length * 3;
+		int bytes = sizeof(int) + 2 * sizeof(byte) + message.MaxUtf8ByteCount();
 		var buffer = RentBuffer.Share(bytes);
 
 		try
