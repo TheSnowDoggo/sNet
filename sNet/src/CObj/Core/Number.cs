@@ -98,7 +98,7 @@ public sealed class Number : Obj,
 	{
 		TypeId.String => ToString(),
 		TypeId.Number => this,
-		TypeId.Bool => new Bool(_value != 0),
+		TypeId.Bool => (Bool)(_value != 0),
 		_ => Nil.Value,
 	};
 }

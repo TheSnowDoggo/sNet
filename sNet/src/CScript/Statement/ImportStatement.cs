@@ -6,7 +6,7 @@ public sealed class ImportStatement : Statement
 	
 	public string Name { get; init; }
 	public string Alias { get; init; }
-
+	
 	public new static ImportStatement Parse(CsrTokenStream stream)
 	{
 		int line = stream.Peek().Line;

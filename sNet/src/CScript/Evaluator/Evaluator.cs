@@ -156,7 +156,7 @@ public sealed class Evaluator
         case CsrId.Not:
             EvalNot();
             break;
-        case CsrId.UnaryMinus:
+        case CsrId.Minus:
             EvalMinus();
             break;
         case CsrId.Invoke:

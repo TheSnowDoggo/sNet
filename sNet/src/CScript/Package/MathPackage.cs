@@ -57,7 +57,7 @@ public sealed class MathPackage : Package
 	}.ToFrozenDictionary();
 	
 	public override string Name => "Math";
-	public override Obj Export => Exports;
+	public override ReadOnlyTable Export => Exports;
 
 	private static GlobalFunction CreateUnary(Func<double, double> func)
 	{

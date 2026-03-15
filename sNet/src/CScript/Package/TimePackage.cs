@@ -12,7 +12,7 @@ public sealed class TimePackage : Package
 	}.ToFrozenDictionary();
 
 	public override string Name => "Time";
-	public override Obj Export => Exports;
+	public override ReadOnlyTable Export => Exports;
 
 	private static Number Unix(Obj[] args)
 	{

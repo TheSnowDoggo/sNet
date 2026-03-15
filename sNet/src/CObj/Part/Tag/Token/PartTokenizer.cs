@@ -5,28 +5,6 @@ namespace sNet.CScriptPro;
 
 public sealed class PartTokenizer : Tokenizer<PartId, PartToken>
 {
-    private static readonly FrozenDictionary<char, PartId> Single = new Dictionary<char, PartId>()
-    {
-        { '(', PartId.OpenParen },
-        { ')', PartId.CloseParen },
-        { '{', PartId.OpenBrace },
-        { '}', PartId.CloseBrace },
-        { '$', PartId.Dollar },
-        { '%', PartId.Percentage },
-        { ';', PartId.Semicolon },
-        { ':', PartId.Colon },
-        { ',', PartId.Comma },
-        { '!', PartId.Bang },
-        { '.', PartId.Period },
-    }.ToFrozenDictionary();
-
-    private static readonly FrozenDictionary<string, PartId> Keywords = new Dictionary<string, PartId>()
-    {
-        { "Vec2", PartId.Vec2 },
-        { "Key", PartId.Key },
-        { "Color", PartId.Color },
-    }.ToFrozenDictionary();
-    
     public PartTokenizer(TextReader reader)
         : base(reader) { }
     
@@ -39,8 +17,8 @@ public sealed class PartTokenizer : Tokenizer<PartId, PartToken>
         return new PartTokenizer(fs).Tokenize();
     }
     
-    protected override IReadOnlyDictionary<char, PartId> SingleMap => Single;
-    protected override IReadOnlyDictionary<string, PartId> KeywordsMap => Keywords;
+    protected override IReadOnlyDictionary<char, PartId> SingleOperators => TagConfig.SingleOperators;
+    protected override IReadOnlyDictionary<string, PartId> KeywordsMap => TagConfig.Keywords;
 
     protected override PartId IdentifierId => PartId.Identifier;
     protected override PartId LiteralId => PartId.Literal;

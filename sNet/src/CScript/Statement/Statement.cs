@@ -37,6 +37,8 @@ public abstract class Statement
                 => ValueStatement.Parse(stream, ReturnType.Continue),
             CsrId.Import
                 => ImportStatement.Parse(stream),
+            CsrId.Include
+                => IncludeStatement.Parse(stream),
             _ => throw new ParserException(head.Line, $"Unrecognised start of statement: {head.Type}."),
         };
     }

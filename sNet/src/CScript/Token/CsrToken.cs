@@ -7,6 +7,6 @@ public sealed class CsrToken : Token<CsrId>
 	
 	public bool IsCompound()
 	{
-		return CsrTokenizer.Compound.Contains(Type) && ReferenceEquals(Value, Bool.True);
+		return CsrConfig.Compound.Contains(Type) && ReferenceEquals(Value, Bool.True);
 	}
 }

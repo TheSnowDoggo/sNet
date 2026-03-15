@@ -2,19 +2,22 @@
 
 public sealed class Bool : Obj, IEquatable<Bool>
 {
+	private static readonly Lazy<Bool> TrueLazy = new Lazy<Bool>(() => new Bool(true));
+	public static readonly Lazy<Bool> FalseLazy = new Lazy<Bool>(() => new Bool(false));
+	
 	private readonly bool _value;
 
-	public Bool(bool value)
+	private Bool(bool value)
 	{
 		_value = value;
 	}
 
 	public override TypeId TypeId => TypeId.Bool;
 
-	public static Bool True { get; } = new Bool(true);
-	public static Bool False { get; } = new Bool(false);
+	public static Bool True => TrueLazy.Value;
+	public static Bool False => FalseLazy.Value;
 	
-	public static implicit operator Bool(bool value) => new Bool(value);
+	public static implicit operator Bool(bool value) => value ? TrueLazy.Value : FalseLazy.Value;
 	public static implicit operator bool(Bool value) => value._value;
 	
 	public static bool operator ==(Bool a, Bool b) => Equals(a, b);
@@ -76,7 +79,7 @@ public sealed class Bool : Obj, IEquatable<Bool>
 
 	public override Obj Clone()
 	{
-		return new Bool(_value);
+		return _value;
 	}
 
 	public override Obj Cast(TypeId to) => to switch

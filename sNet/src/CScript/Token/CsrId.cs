@@ -14,7 +14,7 @@ public enum CsrId
 	// Operator
 	
 	Invoke,
-	UnaryMinus,
+	Minus,
 	Complement,
 	Not,
 	Period,
@@ -61,6 +61,7 @@ public enum CsrId
 	Continue,
 	Import,
 	As,
+	Include,
 	Cast,
 	Typeof,
 	DynamicCast,

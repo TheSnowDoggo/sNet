@@ -91,6 +91,12 @@ public sealed class PartTag
 
     private void ReadSubProperties(PartStream stream, bool redefine = false)
     {
+        if (stream.Peek().Type == PartId.Semicolon)
+        {
+            stream.Read();
+            return;
+        }
+        
         stream.Consume(PartId.OpenBrace);
         
         while (!stream.EndOfStream && stream.Peek().Type != PartId.CloseBrace)
@@ -130,14 +136,7 @@ public sealed class PartTag
 
                 var ext = Parse(filepath);
 
-                if (stream.Peek().Type == PartId.Semicolon)
-                {
-                    stream.Read();
-                }
-                else
-                {
-                    ext.ReadSubProperties(stream, true);
-                }
+                ext.ReadSubProperties(stream, true);
                 
                 Children.Add(ext);
                 break;

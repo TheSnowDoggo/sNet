@@ -27,12 +27,12 @@ public abstract class Tokenizer<Id, TokenType>
 	/// <summary>
 	/// Gets a dictionary containing 2-character operators or null if none are defined.
 	/// </summary>
-	protected virtual IReadOnlyDictionary<string, Id> DoubleMap => null;
+	protected virtual IReadOnlyDictionary<string, Id> DoubleOperators => null;
 	
 	/// <summary>
 	/// Gets a dictionay containing 1-character operators or null if none are defined.
 	/// </summary>
-	protected virtual IReadOnlyDictionary<char, Id> SingleMap => null;
+	protected virtual IReadOnlyDictionary<char, Id> SingleOperators => null;
 
 	/// <summary>
 	/// Gets a set containing operators which support compound assignment or null if none are defined.
@@ -187,13 +187,13 @@ public abstract class Tokenizer<Id, TokenType>
 	
 	private TokenType NextToken()
 	{
-		if (DoubleMap != null && DoubleMap.TryGetValue($"{_current}{Peek()}", out var tokenType))
+		if (DoubleOperators != null && DoubleOperators.TryGetValue($"{_current}{Peek()}", out var tokenType))
 		{
 			TryRead();
 			return Create(_line, tokenType, $"{_current}{Peek()}");
 		}
 		
-		if (SingleMap != null && SingleMap.TryGetValue(_current, out var singleType))
+		if (SingleOperators != null && SingleOperators.TryGetValue(_current, out var singleType))
 		{
 			return Create(_line, singleType, _current.ToString());
 		}

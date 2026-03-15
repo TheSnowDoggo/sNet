@@ -17,7 +17,7 @@ public sealed class InputPackage : Package
 	}.ToFrozenDictionary();
 	
 	public override string Name => "Input";
-	public override Obj Export => Exports;
+	public override ReadOnlyTable Export => Exports;
 	
 	private static Bool KeyPressed(Obj[] args)
 	{

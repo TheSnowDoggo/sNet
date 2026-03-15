@@ -14,7 +14,7 @@ public sealed class IOPackage : Package
 	}.ToFrozenDictionary();
 	
 	public override string Name => "IO";
-	public override Obj Export => Exports;
+	public override ReadOnlyTable Export => Exports;
 
 	public static TextWriter Out { get; set; } = Console.Out;
 

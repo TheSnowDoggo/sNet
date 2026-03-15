@@ -25,5 +25,5 @@ public sealed class ServerPackage : Package
 	public NetServer Server { get; }
 
 	public override string Name => "Server";
-	public override Obj Export => _export;
+	public override ReadOnlyTable Export => _export;
 }

@@ -4,45 +4,6 @@ namespace sNet.CScriptPro;
 
 public sealed class RpnParser
 {
-	private const int AssignPrecedence = 0;
-	private const int UnaryPrecedence  = 11;
-	
-	private static readonly FrozenDictionary<CsrId, int> Precedence = new Dictionary<CsrId, int>()
-	{
-		{ CsrId.Invoke, 12 },
-		{ CsrId.Period, 12 },
-		{ CsrId.DynamicCast, 12 },
-		{ CsrId.Complement, UnaryPrecedence },
-		{ CsrId.Not, UnaryPrecedence },
-		{ CsrId.UnaryMinus, UnaryPrecedence },
-		{ CsrId.Cast, UnaryPrecedence },
-		{ CsrId.Typeof, UnaryPrecedence },
-		{ CsrId.Mul, 10 },
-		{ CsrId.Div, 10 },
-		{ CsrId.Rem, 10 },
-		{ CsrId.Add, 9 },
-		{ CsrId.Sub, 9 },
-		{ CsrId.ShiftLeft, 8 },
-		{ CsrId.ShiftRight, 8 },
-		{ CsrId.LessThan, 7 },
-		{ CsrId.GreaterThan, 7 },
-		{ CsrId.LessThanOrEqual, 7 },
-		{ CsrId.GreaterThanOrEqual, 7 },
-		{ CsrId.Equals, 6 },
-		{ CsrId.NotEquals, 6 },
-		{ CsrId.And, 5 },
-		{ CsrId.Xor, 2 },
-		{ CsrId.Or, 3 },
-		{ CsrId.Assign, AssignPrecedence },
-		{ CsrId.OpenParen, int.MinValue },
-		{ CsrId.Comma, int.MinValue },
-	}.ToFrozenDictionary();
-
-	private static readonly FrozenDictionary<CsrId, CsrId> UnaryMap = new Dictionary<CsrId, CsrId>()
-	{
-		{ CsrId.Sub, CsrId.UnaryMinus },
-	}.ToFrozenDictionary();
-
 	private readonly CsrTokenStream _stream;
 	private List<CsrToken> _result;
 	private Stack<CsrToken> _opStack;
@@ -102,14 +63,7 @@ public sealed class RpnParser
 				ParseCast(token);
 				break;
 			default:
-				if ((_stream.Current == 0 || Precedence.ContainsKey(_stream.Last(2).Type) && !_stream.Last(2).IsCompound()) &&
-				    UnaryMap.TryGetValue(token.Type, out var unaryType))
-				{
-					token.Type = unaryType;
-				}
-
 				LoadOperator(token);
-				
 				break;
 			}
 		}
@@ -127,6 +81,11 @@ public sealed class RpnParser
 	private static bool IsOpen(CsrToken csrToken)
 	{
 		return csrToken.Type is CsrId.OpenParen or CsrId.OpenSquare;
+	}
+
+	private static bool IsOperator(CsrToken csrToken)
+	{
+		return CsrConfig.Precedence.ContainsKey(csrToken.Type);
 	}
 
 	private void ParseImplicit(int line)
@@ -199,10 +158,10 @@ public sealed class RpnParser
 	{
 		if (csrToken.IsCompound())
 		{
-			return AssignPrecedence;
+			return CsrConfig.AssignPrecedence;
 		}
 		
-		if (Precedence.TryGetValue(csrToken.Type, out var precedence))
+		if (CsrConfig.Precedence.TryGetValue(csrToken.Type, out int precedence))
 		{
 			return precedence;
 		}
@@ -210,31 +169,26 @@ public sealed class RpnParser
 		throw new ParserException(_stream.Line, $"Unrecognized operator {csrToken.Type}.");
 	}
 
-	private bool ShouldFlush(CsrToken peek,  int precedence)
+	private bool ShouldFlush(CsrToken token, int precedence, CsrToken other)
 	{
-		if (IsOpen(peek) || peek.Type == CsrId.Comma)
+		if (IsOpen(other))
 		{
 			return false;
 		}
-		
-		int opPrecedence = GetPrecedence(peek);
 
-		if (opPrecedence > precedence)
+		int otherPrecedence = GetPrecedence(other);
+
+		if (precedence < otherPrecedence)
 		{
 			return true;
 		}
 
-		if (opPrecedence < precedence)
+		if (precedence > otherPrecedence)
 		{
 			return false;
 		}
 
-		if (opPrecedence == AssignPrecedence && precedence == AssignPrecedence)
-		{
-			return false;
-		}
-
-		if (opPrecedence == UnaryPrecedence && precedence == UnaryPrecedence)
+		if (CsrConfig.RightAssociative.Contains(token.Type) && CsrConfig.RightAssociative.Contains(other.Type))
 		{
 			return false;
 		}
@@ -242,16 +196,22 @@ public sealed class RpnParser
 		return true;
 	}
 	
-	private void LoadOperator(CsrToken csrToken)
+	private void LoadOperator(CsrToken token)
 	{
-		int precedence = GetPrecedence(csrToken);
-
-		while (_opStack.TryPeek(out var op) && ShouldFlush(op, precedence))
+		if ((_stream.Current == 0 || IsOperator(_stream.Last(2)) && !_stream.Last(2).IsCompound()) &&
+		    CsrConfig.UnaryMap.TryGetValue(token.Type, out var unaryType))
+		{
+			token.Type = unaryType;
+		}
+		
+		int precedence = GetPrecedence(token);
+		
+		while (_opStack.TryPeek(out var op) && ShouldFlush(token, precedence, op))
 		{
 			TransferOperator();
 		}
 		
-		_opStack.Push(csrToken);
+		_opStack.Push(token);
 	}
 	
 	private void FlushComma()
