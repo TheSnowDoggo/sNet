@@ -14,4 +14,29 @@ public sealed class ReturnValue
     
     public ReturnType Type { get; }
     public Obj Value { get; }
+
+    public static bool TryExit(ref ReturnValue returnValue)
+    {
+        switch (returnValue.Type)
+        {
+        case ReturnType.Return:
+            return true;
+        case ReturnType.Break:
+            returnValue = None;
+            return true;
+        default:
+            return false;
+        }
+    }
+    
+    public static bool TryExit(ref ReturnValue returnValue, Context context)
+    {
+        if (!TryExit(ref returnValue))
+        {
+            return false;
+        }
+        
+        context.CloseScope();
+        return true;
+    }
 }

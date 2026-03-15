@@ -31,12 +31,9 @@ public sealed class WhileStatement : BlockStatement
 		{
 			var returnValue = base.Run(context);
 
-			switch (returnValue.Type)
+			if (ReturnValue.TryExit(ref returnValue))
 			{
-			case ReturnType.Return:
 				return returnValue;
-			case ReturnType.Break:
-				return ReturnValue.None;
 			}
 		}
 

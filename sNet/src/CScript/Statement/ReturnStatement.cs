@@ -21,6 +21,7 @@ public sealed class ReturnStatement : ExpressionStatement
 	public override ReturnValue Run(Context context)
 	{
 		var value = new Evaluator(context, Expression).Evaluate();
+		
 		return new ReturnValue(ReturnType.Return, value);
 	}
 }

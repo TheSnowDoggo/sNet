@@ -31,6 +31,8 @@ public abstract class Statement
                 => FunctionDefinition.ParseStatement(stream),
             CsrId.For
                 => ForStatement.Parse(stream),
+            CsrId.Foreach
+                => ForeachStatement.Parse(stream),
             CsrId.Break
                 => ValueStatement.Parse(stream, ReturnType.Break),
             CsrId.Continue

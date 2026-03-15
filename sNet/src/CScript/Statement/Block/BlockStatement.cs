@@ -8,7 +8,7 @@ public class BlockStatement : Statement
 
 	public new static BlockStatement Parse(CsrTokenStream stream)
 	{
-		int line = stream.Line;
+		int line = stream.Peek().Line;
 
 		stream.Consume(CsrId.OpenBrace);
 		

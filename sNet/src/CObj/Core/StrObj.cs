@@ -1,8 +1,11 @@
-﻿namespace sNet.CScriptPro;
+﻿using System.Collections;
+
+namespace sNet.CScriptPro;
 
 public sealed class StrObj : Obj, 
 	IEquatable<StrObj>, 
-	IComparable<StrObj>
+	IComparable<StrObj>,
+	IEnumerable<Obj>
 {
 	private readonly string _value;
 	
@@ -104,6 +107,19 @@ public sealed class StrObj : Obj,
 		TypeId.Bool => Bool.Parse(_value),
 		_ => Nil.Value,
 	};
+
+	public IEnumerator<Obj> GetEnumerator()
+	{
+		for (int i = 0; i < _value.Length; i++)
+		{
+			yield return _value[i].ToString();
+		}
+	}
+
+	IEnumerator IEnumerable.GetEnumerator()
+	{
+		return GetEnumerator();
+	}
 
 	private Number IndexOf(Obj[] args)
 	{

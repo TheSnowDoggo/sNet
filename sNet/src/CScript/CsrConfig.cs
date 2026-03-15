@@ -73,6 +73,8 @@ public static class CsrConfig
 		{ "while", CsrId.While },
 		{ "return", CsrId.Return },
 		{ "for", CsrId.For },
+		{ "foreach", CsrId.Foreach },
+		{ "in", CsrId.In },
 		{ "break", CsrId.Break },
 		{ "continue", CsrId.Continue },
 		{ "import", CsrId.Import },

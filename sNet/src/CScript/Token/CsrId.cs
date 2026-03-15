@@ -57,6 +57,8 @@ public enum CsrId
 	While,
 	Return,
 	For,
+	Foreach,
+	In,
 	Break,
 	Continue,
 	Import,

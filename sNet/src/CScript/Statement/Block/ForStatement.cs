@@ -42,28 +42,18 @@ public sealed class ForStatement : BlockStatement
 		var condition = new Evaluator(context, Condition);
 		var increment = new Evaluator(context, Increment);
 		
-		var returnValue = ReturnValue.None;
-
 		while (condition.Evaluate().AsBool())
 		{
-			returnValue = base.Run(context);
+			var returnValue = base.Run(context);
 
-			if (returnValue.Type == ReturnType.Return)
+			if (ReturnValue.TryExit(ref returnValue, context))
 			{
-				break;
-			}
-
-			if (returnValue.Type == ReturnType.Break)
-			{
-				returnValue = ReturnValue.None;
-				break;
+				return returnValue;
 			}
 			
 			increment.Evaluate();
 		}
 		
-		context.CloseScope();
-		
-		return returnValue;
+		return ReturnValue.None;
 	}
 }
