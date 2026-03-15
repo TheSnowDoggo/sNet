@@ -45,6 +45,11 @@ public abstract class Function : Obj
 			return false;
 		}
 	}
+	
+	public override string ToString()
+	{
+		return $"{Name}()";
+	}
 
 	protected abstract Obj Invoke(Obj[] args);
 

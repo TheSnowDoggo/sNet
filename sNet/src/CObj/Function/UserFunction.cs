@@ -37,9 +37,4 @@ public sealed class UserFunction : Function
 		
 		return Nil.Value;
 	}
-
-	public override string ToString()
-	{
-		return $"{Name}()";
-	}
 }
