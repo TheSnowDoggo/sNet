@@ -16,7 +16,7 @@ public sealed class ServerPartRoot : PartRoot
 	{
 		base.Update(delta);
 		
-		if (Service == null)
+		if (Service == null || Service.Server.Clients.Count == 0)
 		{
 			return;
 		}
