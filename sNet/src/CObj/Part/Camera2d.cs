@@ -6,7 +6,9 @@ public sealed class Camera2d : Part2d
 {
 	public new static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>(Part2d.GlobalProperties)
 	{
-		{ "channel", new GSProperty<Camera2d, Number>(p => p.Channel, (p, v) => p.Channel = v, TypeId.Number) },
+		{ "channel", new GSProperty<Camera2d, Number>(p => p.Channel,
+			(p, v) => p.Channel = v, TypeId.Number)
+		},
 	}.ToFrozenDictionary();
 
 	public Number Channel { get; set; } = 0;

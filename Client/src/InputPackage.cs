@@ -25,7 +25,7 @@ public sealed class InputPackage : Package
 
 		if (Environment.OSVersion.Platform != PlatformID.Win32NT)
 		{
-			throw new InvalidOperationException($"Key press is not available on platform {Environment.OSVersion.Platform}.");
+			return false;
 		}
 
 		if (vkCode is < 0 or >= 256)

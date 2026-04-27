@@ -6,11 +6,21 @@ public sealed class RemoteEvent : Part
 {
 	public new static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>(Part.GlobalProperties)
 	{
-		{ "fireAllClients", new GProperty<RemoteEvent>(p => GlobalFunction.Create(p.FireAllClients, 0, -1)) },
-		{ "fireClient", new GProperty<RemoteEvent>(p => GlobalFunction.Create(p.FireClient, 1, -1, TypeId.Number)) },
-		{ "fireServer", new GProperty<RemoteEvent>(p => GlobalFunction.Create(p.FireServer, 0, -1)) },
-		{ "client", new GProperty<RemoteEvent>(p => p.Client) },
-		{ "server", new GProperty<RemoteEvent>(p => p.Server) },
+		{ "fireAllClients", new GProperty<RemoteEvent>(
+			p => GlobalFunction.Create(p.FireAllClients, 0, -1))
+		},
+		{ "fireClient", new GProperty<RemoteEvent>(
+			p => GlobalFunction.Create(p.FireClient, 1, -1, TypeId.Number))
+		},
+		{ "fireServer", new GProperty<RemoteEvent>(
+			p => GlobalFunction.Create(p.FireServer, 0, -1))
+		},
+		{ "client", new GProperty<RemoteEvent>(
+			p => p.Client)
+		},
+		{ "server", new GProperty<RemoteEvent>(
+			p => p.Server)
+		},
 	}.ToFrozenDictionary();
 	
 	public Event Client { get; } = new Event();

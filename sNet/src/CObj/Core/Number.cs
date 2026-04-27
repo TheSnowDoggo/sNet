@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Runtime.CompilerServices;
+using SCENeo;
 
 namespace sNet.CScriptPro;
 
@@ -18,6 +19,9 @@ public sealed class Number : Obj,
 
 	public static implicit operator Number(double value) => new Number(value);
 	public static implicit operator double(Number value) => value._value;
+
+	public static explicit operator SCEColor(Number value)
+		=> value._value is <= (int)SCEColor.Black or > (int)SCEColor.Transparent ? SCEColor.Black : (SCEColor)value._value;
 	
 	public static bool operator ==(Number a, Number b) => Equals(a, b);
 	public static bool operator !=(Number a, Number b) => !Equals(a, b);

@@ -31,6 +31,35 @@ public sealed class RenderEngine
 	
 	public Part Root { get; set; }
 	
+	public static bool TryParseAnchor(string s, out Anchor anchor)
+	{
+		anchor = s.ToLower() switch
+		{
+			"" or "tl" => Anchor.None,
+			"tc" => Anchor.Center,
+			"tr" => Anchor.Right,
+			"bl" => Anchor.Bottom,
+			"bc" => Anchor.Bottom | Anchor.Center,
+			"br" => Anchor.Bottom | Anchor.Right,
+			"ml" => Anchor.Middle,
+			"mc" => Anchor.Middle | Anchor.Middle,
+			"mr" => Anchor.Middle | Anchor.Right,
+			_ => (Anchor)(-1),
+		};
+
+		return anchor != (Anchor)(-1);
+	}
+
+	public static Anchor ParseAnchor(string s)
+	{
+		if (!TryParseAnchor(s, out var anchor))
+		{
+			throw new ArgumentOutOfRangeException(nameof(s), s, "Invalid anchor.");
+		}
+
+		return anchor;
+	}
+	
 	public void Render()
 	{
 		if (Root == null)
@@ -184,24 +213,5 @@ public sealed class RenderEngine
 		};
 		
 		_inputs.Add(input);
-	}
-
-	private static bool TryParseAnchor(string anchorStr, out Anchor anchor)
-	{
-		anchor = anchorStr.ToLower() switch
-		{
-			"" or "tl" => Anchor.None,
-			"tc" => Anchor.Center,
-			"tr" => Anchor.Right,
-			"bl" => Anchor.Bottom,
-			"bc" => Anchor.Bottom | Anchor.Center,
-			"br" => Anchor.Bottom | Anchor.Right,
-			"ml" => Anchor.Middle,
-			"mc" => Anchor.Middle | Anchor.Middle,
-			"mr" => Anchor.Middle | Anchor.Right,
-			_ => (Anchor)(-1),
-		};
-
-		return anchor != (Anchor)(-1);
 	}
 }

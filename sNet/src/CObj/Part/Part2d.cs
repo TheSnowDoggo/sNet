@@ -4,10 +4,14 @@ namespace sNet.CScriptPro;
 
 public class Part2d : Part
 {
-	public new static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>(Part.GlobalProperties)
+	protected new static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>(Part.GlobalProperties)
 	{
-		{ "position", new GSProperty<Part2d, Vec2Obj>(p => p.Position, (p, v) => p.Position = v, TypeId.Vec2) },
-		{ "globalPosition", new GSProperty<Part2d, Vec2Obj>(p => p.GlobalPosition, (p, v) => p.GlobalPosition = v, TypeId.Vec2, serializable: false) },
+		{ "position", new GSProperty<Part2d, Vec2Obj>(p => p.Position,
+			(p, v) => p.Position = v, TypeId.Vec2)
+		},
+		{ "globalPosition", new GSProperty<Part2d, Vec2Obj>(p => p.GlobalPosition,
+			(p, v) => p.GlobalPosition = v, TypeId.Vec2, serializable: false)
+		},
 	}.ToFrozenDictionary();
 	
 	private Vec2Obj _position = Vector2.Zero;

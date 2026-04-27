@@ -7,9 +7,9 @@ public sealed class Cmd
 {
 	public const int AnyArgs = -1;
 	
-	private readonly Func<string[], RemoteClient, bool> _action;
+	private readonly Func<CmdCall, bool> _action;
 	
-	private Cmd(Func<string[], RemoteClient, bool> action)
+	private Cmd(Func<CmdCall, bool> action)
 	{
 		_action = action;
 	}
@@ -21,7 +21,7 @@ public sealed class Cmd
 
 	public string Name => _action.Method.Name;
 	
-	public static Cmd Create(Func<string[], RemoteClient, bool> action, int minArgs, int maxArgs, Permission permissions, bool remote = false)
+	public static Cmd Create(Func<CmdCall, bool> action, int minArgs, int maxArgs, Permission permissions, bool remote = false)
 	{
 		if (minArgs < 0)
 		{
@@ -42,7 +42,7 @@ public sealed class Cmd
 		};
 	}
 
-	public static Cmd Create(Func<string[], RemoteClient, bool> action, int args, Permission permissions, bool remote = false)
+	public static Cmd Create(Func<CmdCall, bool> action, int args, Permission permissions, bool remote = false)
 	{
 		return Create(action, args, args, permissions, remote);
 	}
@@ -95,21 +95,21 @@ public sealed class Cmd
 		return list.ToArray();
 	}
 	
-	public bool TryInvoke(string[] args, RemoteClient client)
+	public bool TryInvoke(CmdCall call)
 	{
-		if (client == null && Remote)
+		if (call.Client == null && Remote)
 		{
 			Logger.Error($"Cmd {Name} requires a remote client.");
 			return false;
 		}
 		
-		if (client != null && !client.AuthorisedAll(Permissions))
+		if (call.Client != null && !call.Client.AuthorisedAll(Permissions))
 		{
-			Logger.Error($"Client {client} is not authorised to run cmd {Name}.");
+			Logger.Error($"Client {call.Client} is not authorised to run cmd {Name}.");
 			return false;
 		}
 		
-		int realArgs = args.Length - 1;
+		int realArgs = call.Args.Length - 1;
 
 		if (realArgs < MinArgs)
 		{
@@ -125,12 +125,27 @@ public sealed class Cmd
 
 		try
 		{
-			return _action.Invoke(args, client);
+			return _action.Invoke(call);
 		}
 		catch (Exception ex)
 		{
 			Logger.Error($"Cmd {_action.Method.Name} threw error during invoke: {ex.Message}");
 			return false;
 		}
+	}
+
+	public string GetFormatedArgRange()
+	{
+		if (MinArgs == MaxArgs)
+		{
+			return $"{MinArgs}";
+		}
+		
+		if (MaxArgs == AnyArgs)
+		{
+			return $"{MinArgs}-n";
+		}
+
+		return $"{MinArgs}-{MaxArgs}";
 	}
 }

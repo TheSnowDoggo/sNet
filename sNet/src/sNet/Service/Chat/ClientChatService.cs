@@ -1,6 +1,4 @@
-﻿using sNet.Client;
-
-namespace sNet.Service.Chat;
+﻿namespace sNet.Service.Chat;
 
 public sealed class ClientChatService : ClientService
 {
@@ -25,6 +23,12 @@ public sealed class ClientChatService : ClientService
 
 	public async Task<bool> SendChatAsync(string message)
 	{
+		if (message.Length > ChatService.MaxCharacters)
+		{
+			Logger.Error($"Message exceeds character limit {ChatService.MaxCharacters}.");
+			return false;
+		}
+		
 		try
 		{
 			using var buffer = ChatService.FormatMessage(message);

@@ -7,8 +7,12 @@ public abstract class Render2d : Part2d
 {
 	public new static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>(Part2d.GlobalProperties)
 	{
-		{ "layer", new GSProperty<Render2d, Number>(p => p.Layer, (p, v) => p.Layer = v, TypeId.Number) },
-		{ "anchor", new GSProperty<Render2d, StrObj>(p => p.Anchor, (p, v) => p.Anchor = v, TypeId.String) },
+		{ "layer", new GSProperty<Render2d, Number>(p => p.Layer,
+			(p, v) => p.Layer = v, TypeId.Number)
+		},
+		{ "anchor", new GSProperty<Render2d, StrObj>(p => p.Anchor,
+			(p, v) => p.Anchor = v, TypeId.String)
+		},
 	}.ToFrozenDictionary();
 	
 	public Number Layer { get; set; } = 0;

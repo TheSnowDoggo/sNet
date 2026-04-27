@@ -1,5 +1,6 @@
 ﻿using System.Collections.Frozen;
 using System.Diagnostics;
+using System.Text;
 using sNet.Auth;
 using sNet.Server;
 using sNet.Service.Chat;
@@ -14,8 +15,11 @@ public sealed class ServerCmdService : ServerService
 	{
 		Cmds = new Dictionary<string, Cmd>
 		{
+			{ "help", Cmd.Create(HelpCmd, 0, 0, Permission.None) },
 			{ "shutdown", Cmd.Create(ShutdownCmd, 0, Permission.Admin) },
 			{ "restart", Cmd.Create(RestartCmd, 0, Permission.Admin) },
+			{ "kick", Cmd.Create(KickCmd, 1, 1, Permission.Admin) },
+			{ "cinfo", Cmd.Create(ClientInfoCmd, 1, 1, Permission.Admin) },
 			{ "login", Cmd.Create(LoginCmd, 2, Permission.None, true) },
 			{ "chat", Cmd.Create(ChatCmd, 2, -1, Permission.None) },
 			{ "broadcast", Cmd.Create(BroadcastCmd, 1, -1, Permission.Admin) },
@@ -40,7 +44,7 @@ public sealed class ServerCmdService : ServerService
 			break;
 		}
 	}
-
+	
 	public bool TryRun(string input, RemoteClient client = null)
 	{
 		input = input.Trim();
@@ -59,9 +63,15 @@ public sealed class ServerCmdService : ServerService
 			return false;
 		}
 
-		return cmd.TryInvoke(args, client);
-	}
+		var call = new CmdCall()
+		{
+			Args = args,
+			Client = client,
+		};
 
+		return cmd.TryInvoke(call);
+	}
+	
 	private async Task<bool> SendResponseAsync(int idx, string response)
 	{
 		return await SendAsync(idx, (byte)CmdSid.SendResponse, new SerialString(response));
@@ -81,8 +91,29 @@ public sealed class ServerCmdService : ServerService
 		
 		Task.Run(() => SendResponseAsync(call.Client.Idx, response));
 	}
+
+	private bool HelpCmd(CmdCall call)
+	{
+		var cb = new ColumnBuilder()
+		{
+			Prefix = $"- Displaying {Cmds.Count} Commands -\n",
+		};
+		
+		cb.AddRow("Name", "Args", "Permissions", "Remote");
+		
+		cb.AddHorizontalBorder();
+		
+		foreach ((string name, Cmd cmd) in Cmds)
+		{
+			cb.AddRow(name, cmd.GetFormatedArgRange(), cmd.Permissions, cmd.Remote);
+		}
+		
+		Logger.Info(cb.ToString());
+		
+		return true;
+	}
 	
-	private bool ShutdownCmd(string[] args, RemoteClient client)
+	private bool ShutdownCmd(CmdCall call)
 	{
 		Server.Shutdown();
 
@@ -91,7 +122,7 @@ public sealed class ServerCmdService : ServerService
 		return true;
 	}
 
-	private bool RestartCmd(string[] args, RemoteClient client)
+	private bool RestartCmd(CmdCall call)
 	{
 		Server.Shutdown();
 
@@ -112,8 +143,55 @@ public sealed class ServerCmdService : ServerService
 		Process.Start(psi);
 		return true;
 	}
+	
+	private bool KickCmd(CmdCall call)
+	{
+		if (!TryParseClientIdx(call.Args[1], out int idx))
+		{
+			return false;
+		}
 
-	private static bool LoginCmd(string[] args, RemoteClient client)
+		if (!Server.Kick(idx))
+		{
+			Logger.Error("Kick failed.");
+			return false;
+		}
+		
+		Logger.Info($"Client {idx} kicked successfully.");
+		
+		return true;
+	}
+
+	private bool ClientInfoCmd(CmdCall call)
+	{
+		if (!TryParseClientIdx(call.Args[1], out int idx))
+		{
+			return false;
+		}
+		
+		var client = Server.Clients[idx];
+
+		var cb = new ColumnBuilder()
+		{
+			Prefix = $"- Displaying info for {idx} -\n",
+		};
+
+		cb.AddRow("Name", "Value");
+		
+		cb.AddHorizontalBorder();
+		
+		cb.AddRow("Local", $"{client.Socket.LocalEndPoint}");
+		cb.AddRow("Remote", $"{client.Socket.RemoteEndPoint}");
+		
+		cb.AddRow("Permissions", $"{client.Permissions}");
+		cb.AddRow("Join Time", $"{client.JoinTime}");
+		
+		Logger.Info(cb.ToString());
+		
+		return true;
+	}
+	
+	private static bool LoginCmd(CmdCall call)
 	{
 		if (UserStore.Current == null)
 		{
@@ -121,21 +199,21 @@ public sealed class ServerCmdService : ServerService
 			return false;
 		}
 		
-		var username = args[1];
-		var password = args[2];
+		var username = call.Args[1];
+		var password = call.Args[2];
 
 		if (!UserStore.Current.TryLogin(username, password, out User user))
 		{
 			return false;
 		}
 		
-		client.Grant(user.Permissions);
-		Logger.Info($"{client} login successful, permissions {user.Permissions} granted.");
+		call.Client.Grant(user.Permissions);
+		Logger.Info($"{call.Client} login successful, permissions {user.Permissions} granted.");
 		
 		return true;
 	}
 
-	private bool ChatCmd(string[] args, RemoteClient client)
+	private bool ChatCmd(CmdCall call)
 	{
 		if (!Server.Services.TryGet<ServerChatService>(ServiceId.Chat, out var chatService))
 		{
@@ -143,9 +221,38 @@ public sealed class ServerCmdService : ServerService
 			return false;
 		}
 
-		if (!int.TryParse(args[1], out var idx))
+		if (!TryParseClientIdx(call.Args[1], out int idx))
 		{
-			Logger.Error($"Client idx (\'{args[1]}\') was invalid.");
+			return false;
+		}
+		
+		var message = string.Join(' ', call.Args, 2, call.Args.Length - 2);
+		
+		chatService.FireChat(idx, message);
+
+		return true;
+	}
+
+	private bool BroadcastCmd(CmdCall call)
+	{
+		if (!Server.Services.TryGet<ServerChatService>(ServiceId.Chat, out var chatService))
+		{
+			Logger.Error("Chat Service is not available.");
+			return false;
+		}
+		
+		var message = string.Join(' ', call.Args, 1, call.Args.Length - 1);
+		
+		chatService.FireBroadcast(message);
+
+		return true;
+	}
+
+	private bool TryParseClientIdx(string arg, out int idx)
+	{
+		if (!int.TryParse(arg, out idx))
+		{
+			Logger.Error($"Client idx (\'{arg}\') was invalid.");
 			return false;
 		}
 
@@ -154,25 +261,6 @@ public sealed class ServerCmdService : ServerService
 			Logger.Error($"No client with idx {idx} found.");
 			return false;
 		}
-		
-		var message = string.Join(' ', args, 2, args.Length - 2);
-		
-		chatService.FireChat(idx, message);
-
-		return true;
-	}
-
-	private bool BroadcastCmd(string[] args, RemoteClient client)
-	{
-		if (!Server.Services.TryGet<ServerChatService>(ServiceId.Chat, out var chatService))
-		{
-			Logger.Error("Chat Service is not available.");
-			return false;
-		}
-		
-		var message = string.Join(' ', args, 1, args.Length - 1);
-		
-		chatService.FireBroadcast(message);
 
 		return true;
 	}

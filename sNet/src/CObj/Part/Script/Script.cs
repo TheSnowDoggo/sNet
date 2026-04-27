@@ -6,8 +6,12 @@ public sealed class Script : Part
 {
 	public new static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>(Part.GlobalProperties)
 	{
-		{ "source", new GSProperty<Script, StrObj>(p => p.Source, (p, v) => p.Source = v, TypeId.String) },
-		{ "type", new GSProperty<Script, StrObj>(p => p.Type, (p, v) => p.Type = v, TypeId.String) },
+		{ "source", new GSProperty<Script, StrObj>(p => p.Source,
+			(p, v) => p.Source = v, TypeId.String)
+		},
+		{ "type", new GSProperty<Script, StrObj>(p => p.Type,
+			(p, v) => p.Type = v, TypeId.String)
+		},
 	}.ToFrozenDictionary();
 	
 	public StrObj Source { get; set; } = StrObj.Empty;

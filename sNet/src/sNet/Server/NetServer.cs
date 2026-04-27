@@ -32,7 +32,7 @@ public sealed class NetServer
 	}
 
 	private readonly ConcurrentQueue<Socket> _joinQueue = [];
-	private readonly ConcurrentQueue<int>    _quitQueue = [];
+	private readonly ConcurrentQueue<int> _quitQueue = [];
 
 	private readonly ClientInfo[] _clientInfo;
 
@@ -153,7 +153,7 @@ public sealed class NetServer
 			return false;
 		}
 	}
-
+	
 	public async Task<bool> BroadcastAsync(RentBuffer buffer, HashSet<int> exclude = null)
 	{
 		try
@@ -205,6 +205,7 @@ public sealed class NetServer
 		}
 
 		_quitQueue.Enqueue(idx);
+		
 		return true;
 	}
 
@@ -288,6 +289,9 @@ public sealed class NetServer
 			try
 			{
 				var clientStr = client.ToString();
+			
+				client.Socket.Close();
+				client.Socket?.Dispose();
 				
 				Services.ClientLeft(client);
 				ClientLeft?.Invoke(client);
@@ -321,7 +325,10 @@ public sealed class NetServer
 			
 			try
 			{
-				var client = new RemoteClient(clientSocket);
+				var client = new RemoteClient(clientSocket)
+				{
+					JoinTime = DateTime.Now,
+				};
 
 				Clients.Add(client);
 				_clientInfo[client.Idx] = new ClientInfo(RentBuffer.Share(Constants.BufferSize));

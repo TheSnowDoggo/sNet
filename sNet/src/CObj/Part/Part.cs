@@ -1,6 +1,5 @@
 ﻿using System.Collections.Frozen;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace sNet.CScriptPro;
@@ -12,20 +11,44 @@ public class Part : Obj
 		{ "new", GlobalFunction.Create(New, TypeId.String) },
 		{ "load", GlobalFunction.Create(Load, TypeId.String) },
 	}.ToFrozenDictionary();
-	
-	public static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>()
+
+	protected static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>()
 	{
-		{ "id", new GProperty<Part>(p => (StrObj)p.PartType.ToString()) },
-		{ "uid", new GProperty<Part>(p => (UidObj)p.Uid) },
-		{ "name", new GSProperty<Part, StrObj>(p => p.Name, (p, v) => p.Name = v, TypeId.String) },
-		{ "enabled", new GSProperty<Part, Bool>(p => p.Enabled, (p, v) => p.Enabled = v, TypeId.Bool) },
-		{ "visible", new GSProperty<Part, Bool>(p => p.Visible, (p, v) => p.Visible = v, TypeId.Bool) },
-		{ "parent", new GProperty<Part>(p => (Obj)p.Parent ?? Nil.Value) },
-		{ "children", new GProperty<Part>(p => new ArrayViewObj<Part>(p._children)) },
-		{ "addChild", new GProperty<Part>(p => GlobalFunction.Create(args => p.AddChild((Part)args[0]), TypeId.Part)) },
-		{ "removeChild", new GProperty<Part>(p => GlobalFunction.Create(args => p.RemoveChild((Part)args[0]), TypeId.Part)) },
-		{ "findFirstChild", new GProperty<Part>(p => GlobalFunction.Create(args => p.FindFirstChild((StrObj)args[0]), TypeId.String)) },
-		{ "getByUid", new GProperty<Part>(p => GlobalFunction.Create(p.GetByUid, TypeId.Uid)) },
+		{ "id", new GProperty<Part>(
+			p => (StrObj)p.PartType.ToString())
+		},
+		{ "uid", new GProperty<Part>(
+			p => (UidObj)p.Uid)
+		},
+		{ "parent", new GProperty<Part>(
+			p => (Obj)p.Parent ?? Nil.Value)
+		},
+		{ "children", new GProperty<Part>(
+			p => new ArrayViewObj<Part>(p._children))
+		},
+		
+		{ "name", new GSProperty<Part, StrObj>(p => p.Name,
+			(p, v) => p.Name = v, TypeId.String)
+		},
+		{ "enabled", new GSProperty<Part, Bool>(p => p.Enabled,
+			(p, v) => p.Enabled = v, TypeId.Bool)
+		},
+		{ "visible", new GSProperty<Part, Bool>(p => p.Visible,
+			(p, v) => p.Visible = v, TypeId.Bool)
+		},
+		
+		{ "addChild", new GProperty<Part>(
+			p => GlobalFunction.Create(args => p.AddChild((Part)args[0]), TypeId.Part))
+		},
+		{ "removeChild", new GProperty<Part>(
+			p => GlobalFunction.Create(args => p.RemoveChild((Part)args[0]), TypeId.Part))
+		},
+		{ "findFirstChild", new GProperty<Part>(
+			p => GlobalFunction.Create(args => p.FindFirstChild((StrObj)args[0]), TypeId.String))
+		},
+		{ "getByUid", new GProperty<Part>(
+			p => GlobalFunction.Create(p.GetByUid, TypeId.Uid))
+		},
 	}.ToFrozenDictionary();
 	
 	private readonly List<Part> _children = [];
@@ -113,6 +136,7 @@ public class Part : Obj
 		PartType.Sprite2d => new Sprite2d(),
 		PartType.Box2d => new Box2d(),
 		PartType.RemoteEvent => new RemoteEvent(),
+		PartType.Text2d => new Text2d(),
 		_ => throw new InvalidEnumArgumentException(nameof(partType), (int)partType, typeof(PartType)),
 	};
 

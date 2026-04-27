@@ -6,8 +6,12 @@ public sealed class ModuleScript : Part
 {
 	public new static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>(Part.GlobalProperties)
 	{
-		{ "source", new GSProperty<ModuleScript, StrObj>(p => p.Source, (p, v) => p.Source = v, TypeId.String) },
-		{ "require", new GProperty<ModuleScript>(p => GlobalFunction.Create(p.Require)) },
+		{ "require", new GProperty<ModuleScript>(
+			p => GlobalFunction.Create(p.Require))
+		},
+		{ "source", new GSProperty<ModuleScript, StrObj>(p => p.Source,
+			(p, v) => p.Source = v, TypeId.String)
+		},
 	}.ToFrozenDictionary();
 
 	private Obj _value;

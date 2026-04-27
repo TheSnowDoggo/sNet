@@ -8,7 +8,9 @@ public sealed class Sprite2d : Render2d
 {
 	public new static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>(Render2d.GlobalProperties)
 	{
-		{ "source", new GSProperty<Sprite2d, StrObj>(p => p.Source, (p, v) => p.Source = v, TypeId.String) },
+		{ "source", new GSProperty<Sprite2d, StrObj>(p => p.Source,
+			(p, v) => p.Source = v, TypeId.String)
+		},
 	}.ToFrozenDictionary();
 	
 	private DisplayMap _data;

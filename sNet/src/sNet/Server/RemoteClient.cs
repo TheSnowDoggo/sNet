@@ -13,6 +13,8 @@ public sealed class RemoteClient
 	public int Idx { get; set; }
 	public Permission Permissions { get; private set; }
 
+	public DateTime JoinTime { get; init; }
+	
 	public override string ToString()
 	{
 		return $"[{Idx}] {Socket.RemoteEndPoint}";

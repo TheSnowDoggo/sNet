@@ -8,9 +8,15 @@ public sealed class Box2d : Render2d
 {
 	public new static readonly FrozenDictionary<string, IProperty> GlobalProperties = new Dictionary<string, IProperty>(Render2d.GlobalProperties)
 	{
-		{ "width", new GSProperty<Box2d, Number>(p => p._view.Width, (p, v) => p._view.Width = (int)v, TypeId.Number) },
-		{ "height", new GSProperty<Box2d, Number>(p => p._view.Height, (p, v) => p._view.Height = (int)v, TypeId.Number) },
-		{ "color", new GSProperty<Box2d, Number>(p => (int)p._view.Value.BgColor, SetColor, TypeId.Number) },
+		{ "width", new GSProperty<Box2d, Number>(p => p._view.Width,
+			(p, v) => p._view.Width = int.Max((int)v, 0), TypeId.Number)
+		},
+		{ "height", new GSProperty<Box2d, Number>(p => p._view.Height,
+			(p, v) => p._view.Height = int.Max((int)v, 0), TypeId.Number)
+		},
+		{ "color", new GSProperty<Box2d, Number>(p => (int)p._view.Value.BgColor,
+			(p, v) => p._view.Value = new Pixel((SCEColor)v),TypeId.Number)
+		},
 	}.ToFrozenDictionary();
 	
 	private readonly PlainView2D<Pixel> _view = new PlainView2D<Pixel>();
@@ -30,16 +36,4 @@ public sealed class Box2d : Render2d
 	public override IReadOnlyDictionary<string, IProperty> Properties => GlobalProperties;
 
 	public override IRenderable Render() => _vf;
-
-	private static void SetColor(Box2d box, Number value)
-	{
-		var color = (SCEColor)(int)value;
-
-		if (color is < SCEColor.Black or > SCEColor.Transparent)
-		{
-			color = SCEColor.Black;
-		}
-
-		box._view.Value = new Pixel(color);
-	}
 }

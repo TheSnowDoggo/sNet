@@ -85,6 +85,7 @@ public sealed class GameScene : Scene
 
 		ImageLoader.Default = new ImageLoader();
 		ScriptLoader.Default = new ScriptLoader();
+		PartLoader.Default = new PartLoader();
 		
 		_root.Clear();
 	}

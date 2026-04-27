@@ -2,6 +2,8 @@
 
 public static class ChatService
 {
+	public const int MaxCharacters = 256;
+	
 	public static RentBuffer FormatMessage(string message)
 	{
 		int bytes = sizeof(int) + 2 * sizeof(byte) + message.MaxUtf8ByteCount();

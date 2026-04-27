@@ -40,7 +40,7 @@ public sealed class StrObj : Obj,
 		_ => Nil.Value,
 	};
 
-	private Obj GetMember(string member) => member switch
+	private Obj GetMember(string key) => key switch
 	{
 		"length" => (Number)Length,
 		"indexOf" => GlobalFunction.Create(IndexOf, TypeId.String),
@@ -57,7 +57,13 @@ public sealed class StrObj : Obj,
 	private Obj GetIndex(Number key)
 	{
 		int index = (int)key;
-		return index >= 0 && index < Length ? _value[index].ToString() : Nil.Value;
+
+		if (index < 0 || index >= _value.Length)
+		{
+			return Nil.Value;
+		}
+		
+		return _value[index].ToString();
 	}
 
 	public int CompareTo(StrObj other)

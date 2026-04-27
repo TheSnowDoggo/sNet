@@ -128,7 +128,9 @@ public static class SerialExtensions
 	
 	public static int WriteNetUtf16(this Stream stream, string value)
 	{
-		if (stream.Position + value.Length * sizeof(char) > stream.Length)
+		int bytes = sizeof(int) + value.Length * sizeof(char);
+		
+		if (stream.Position + bytes > stream.Length)
 		{
 			throw new EndOfStreamException("String will exceed stream bounds.");
 		}
@@ -146,14 +148,9 @@ public static class SerialExtensions
 			stream.Write(span);
 		}
 
-		return sizeof(int) + value.Length * sizeof(char);
+		return bytes;
 	}
 
-	public static int Utf16ByteCount(this string s)
-	{
-		return sizeof(int) + s.Length;
-	}
-	
 	public static int WriteObj(this Stream stream, Obj obj)
 	{
 		stream.WriteByte((byte)obj.TypeId);

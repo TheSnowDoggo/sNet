@@ -10,4 +10,5 @@ public enum PartType
 	Sprite2d,
 	Box2d,
 	RemoteEvent,
+	Text2d,
 }

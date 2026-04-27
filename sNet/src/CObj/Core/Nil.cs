@@ -2,9 +2,9 @@
 
 public sealed class Nil : Obj
 {
-	private static readonly Lazy<Nil> _lazy = new Lazy<Nil>(() => new Nil());
+	private static readonly Lazy<Nil> Lazy = new Lazy<Nil>(() => new Nil());
 	
-	public static Nil Value => _lazy.Value;
+	public static Nil Value => Lazy.Value;
 
 	public override TypeId TypeId => TypeId.Nil;
 
