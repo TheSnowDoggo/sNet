@@ -40,13 +40,15 @@ public sealed class ImportStatement : Statement
 	public override ReturnValue Run(Context context)
 	{
 		base.Run(context);
+		
+		var packetManager = context.GetPacketManager();
 
-		if (PackageManager.Current == null)
+		if (packetManager == null)
 		{
 			throw new InterpreterException(context.Line, "No package manager is loaded.");
 		}
 		
-		if (!PackageManager.Current.Packages.TryGetValue(Name, out var package))
+		if (!packetManager.Packages.TryGetValue(Name, out var package))
 		{
 			throw new InterpreterException(context.Line, $"Package ('{Name}') not found.");
 		}

@@ -12,6 +12,7 @@ public sealed class Context
 
     public int Line { get; set; } = 1;
     public Context Parent { get; }
+    public PackageManager PackageManager { get; set; }
 
     public Obj this[string name]
     {
@@ -49,7 +50,7 @@ public sealed class Context
     {
         _scopes.Push([]);
     }
-
+    
     public void CloseScope()
     {
         if (!_scopes.TryPop(out var scope))
@@ -98,6 +99,11 @@ public sealed class Context
         variables.Push(new Variable(value, attributes));
     }
 
+    public PackageManager GetPacketManager()
+    {
+        return PackageManager ?? PackageManager.Default;
+    }
+    
     private bool TryGetLocal(string name, out Variable variable)
     {
         var current = this;

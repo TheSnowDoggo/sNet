@@ -26,12 +26,14 @@ public sealed class IncludeStatement : Statement
 	{
 		base.Run(context);
 
-		if (PackageManager.Current == null)
+		var packetManager = context.GetPacketManager();
+		
+		if (packetManager == null)
 		{
 			throw new InterpreterException(context.Line, "No package manager is loaded.");
 		}
 		
-		if (!PackageManager.Current.Packages.TryGetValue(Name, out var package))
+		if (!packetManager.Packages.TryGetValue(Name, out var package))
 		{
 			throw new InterpreterException(context.Line, $"Package ('{Name}') not found.");
 		}

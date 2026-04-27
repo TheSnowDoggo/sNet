@@ -68,7 +68,7 @@ public sealed class MathPackage : Package
 			return func.Invoke((double)(Number)args[0]);
 		}
 	}
-
+	
 	private static GlobalFunction CreateBinary(Func<double, double, double> func)
 	{
 		return GlobalFunction.Create(Func, TypeId.Number, TypeId.Number);
@@ -106,17 +106,11 @@ public sealed class MathPackage : Package
 		return Math.Round((double)args[0], digits);
 	}
 	
-	private static Number Log(Obj[] args)
-	{
-		return Math.Log((double)args[0], (double)args[1]);
-	}
-
 	private static Number Logb2(Obj[] args)
 	{
 		return Math.ILogB((double)args[0]);
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private static double Lerp(double value, double min, double max)
 	{
 		return double.Lerp(min, max, value);

@@ -14,7 +14,9 @@ public sealed class ServerConfig
 	public int Port { get; set; } = 17324;
 	public int MaxClients { get; set; } = 10;
 	public int MaxClientBacklog { get; set; } = 10;
-	
+
+	public int UpdateFPSCap { get; set; } = 30;
+
 	[JsonIgnore]
 	public string Filepath { get; set; }
 
@@ -25,7 +27,9 @@ public sealed class ServerConfig
 			if (!File.Exists(filepath))
 			{
 				config = new ServerConfig(filepath);
+				
 				Logger.Info($"Creating server config at {filepath}.");
+				
 				return config.TrySave(FileMode.CreateNew);
 			}
 			
@@ -39,6 +43,7 @@ public sealed class ServerConfig
 			}
 			
 			Logger.Error($"Failed to load config from {filepath}: Result was null.");
+			
 			return false;
 		}
 		catch (Exception ex)

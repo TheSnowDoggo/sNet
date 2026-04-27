@@ -18,7 +18,7 @@ public class Client
 	{
 		Updater = new Updater(Update)
 		{
-			FrameCap = 60,
+			FrameCap = 30,
 		};
 		
 		Viewport = new Viewport()

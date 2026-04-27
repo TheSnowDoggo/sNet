@@ -29,10 +29,7 @@ public sealed class Server
 	
 	public Server()
 	{
-		_updater = new Updater(Update)
-		{
-			FrameCap = 60,
-		};
+		_updater = new Updater(Update);
 		
 		_root.Service = _partService;
 		_partService.Root = _root;
@@ -44,18 +41,13 @@ public sealed class Server
 		{
 			return false;
 		}
+		
+		SetupServer(config);
 
-		_server = NetServer.FromConfig(config);
-		
-		_server.Services.Add(new ServerChatService());
-		_server.Services.Add(_partService);
-		_server.Services.Add(_assetService);
-		_server.Services.Add(_cmdService);
-		
-		_server.ClientJoined += Server_OnClientJoined;
-		_server.ClientLeft += Server_OnClientLeft;
+		_updater.FrameCap = config.UpdateFPSCap;
 
 		_serverPackage = new ServerPackage(_server);
+		
 		PackageManager.Default.Packages.Add("Server", _serverPackage);
 		
 		if (!_server.Bind())
@@ -108,6 +100,19 @@ public sealed class Server
 		}
 		
 		return true;
+	}
+
+	private void SetupServer(ServerConfig config)
+	{
+		_server = NetServer.FromConfig(config);
+		
+		_server.Services.Add(new ServerChatService());
+		_server.Services.Add(_partService);
+		_server.Services.Add(_assetService);
+		_server.Services.Add(_cmdService);
+		
+		_server.ClientJoined += Server_OnClientJoined;
+		_server.ClientLeft += Server_OnClientLeft;
 	}
 
 	private void Server_OnClientJoined(RemoteClient client)
